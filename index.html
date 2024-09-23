@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Musik-Events suchen</title>
+</head>
+<body>
+  <h1>Finde Musik-Events nach Musikrichtung und Land</h1>
+
+  <!-- Dropdown für Musikrichtungen -->
+  <label for="genre">Musikrichtung auswählen:</label>
+  <select id="genre">
+    <option value="rock">Rock</option>
+    <option value="pop">Pop</option>
+    <option value="schlager">Schlager</option>
+  </select>
+
+  <!-- Dropdown für Länder -->
+  <label for="country">Land auswählen:</label>
+  <select id="country">
+    <option value="US">USA</option>
+    <option value="CH">Schweiz</option>
+    <option value="BR">Brasilien</option>
+    <option value="TH">Thailand</option>
+  </select>
+
+  <button onclick="searchEvents()">Events suchen</button>
+
+  <!-- Bereich, in dem die Ergebnisse angezeigt werden -->
+  <div id="result"></div>
+
+  <!-- Verknüpfung zum JavaScript-File -->
+  <script src="events.js"></script>
+</body>
+</html>
