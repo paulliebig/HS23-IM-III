@@ -1,10 +1,10 @@
-<html>
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Musik-Events und Spotify Integration</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js for rendering the chart -->
 </head>
 <body>
   <!-- Bereich für die Musikevents-Suche -->
@@ -16,6 +16,9 @@
     <option value="rock">Rock</option>
     <option value="pop">Pop</option>
     <option value="schlager">Schlager</option>
+    <option value="hip-hop">Hip-Hop</option>
+    <option value="k-pop">K-Pop</option>
+    <option value="latin">Latin</option>
   </select>
 
   <!-- Dropdown für Länder -->
@@ -27,22 +30,41 @@
     <option value="TH">Thailand</option>
   </select>
 
-  <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
+  <!-- Button for triggering the data fetch -->
   <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
 
-  <!-- Bereich für die Anzeige der Musikevents -->
+  <!-- Display area for Musikevents -->
   <h2>Musikevents</h2>
   <div id="result"></div>
 
-  <!-- Bereich für die Anzeige der Top-Songs -->
+  <!-- Display area for Top-Songs -->
   <h2>Top 3 Songs</h2>
   <div id="spotify-songs"></div>
 
-  <!-- Bereich für die Anzeige der Top-Künstler -->
+  <!-- Display area for Top-Künstler -->
   <h2>Top 3 Künstler</h2>
   <div id="spotify-artists"></div>
 
-  <!-- Verknüpfung zum JavaScript-File -->
+  <!-- Separate section for Genre Trends across continents -->
+  <h2>Entwicklung der Musikgenres auf den Kontinenten (letzte 10 Jahre)</h2>
+
+  <!-- Dropdown for selecting genres -->
+  <label for="trendGenre">Genre für Trends auswählen:</label>
+  <select id="trendGenre">
+    <option value="pop">Pop</option>
+    <option value="hip-hop">Hip-Hop</option>
+    <option value="rock">Rock</option>
+    <option value="k-pop">K-Pop</option>
+    <option value="latin">Latin</option>
+  </select>
+
+  <!-- Button for fetching trend data -->
+  <button onclick="getGenreTrendsOverYears()">Entwicklung anzeigen</button>
+
+  <!-- Canvas for the chart showing genre trends -->
+  <canvas id="genreChart" width="400" height="200"></canvas>
+
+  <!-- Include the JavaScript file -->
   <script src="events.js"></script>
 </body>
 </html>
