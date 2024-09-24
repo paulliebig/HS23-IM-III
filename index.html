@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Musik-Events und Spotify Integration</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js for rendering the chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js for graph -->
 </head>
 <body>
   <!-- Bereich für die Musikevents-Suche -->
@@ -16,9 +16,6 @@
     <option value="rock">Rock</option>
     <option value="pop">Pop</option>
     <option value="schlager">Schlager</option>
-    <option value="hip-hop">Hip-Hop</option>
-    <option value="k-pop">K-Pop</option>
-    <option value="latin">Latin</option>
   </select>
 
   <!-- Dropdown für Länder -->
@@ -30,41 +27,37 @@
     <option value="TH">Thailand</option>
   </select>
 
-  <!-- Button for triggering the data fetch -->
+  <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
   <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
 
-  <!-- Display area for Musikevents -->
+  <!-- Bereich für die Anzeige der Musikevents -->
   <h2>Musikevents</h2>
   <div id="result"></div>
 
-  <!-- Display area for Top-Songs -->
+  <!-- Bereich für die Anzeige der Top-Songs -->
   <h2>Top 3 Songs</h2>
   <div id="spotify-songs"></div>
 
-  <!-- Display area for Top-Künstler -->
+  <!-- Bereich für die Anzeige der Top-Künstler -->
   <h2>Top 3 Künstler</h2>
   <div id="spotify-artists"></div>
 
-  <!-- Separate section for Genre Trends across continents -->
-  <h2>Entwicklung der Musikgenres auf den Kontinenten (letzte 10 Jahre)</h2>
-
-  <!-- Dropdown for selecting genres -->
-  <label for="trendGenre">Genre für Trends auswählen:</label>
+  <!-- Bereich für die Abfrage der Musik-Genre-Trends über Kontinente -->
+  <h1>Entwicklung der Musikgenres über die Kontinente</h1>
+  <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
   <select id="trendGenre">
+    <option value="rock">Rock</option>
     <option value="pop">Pop</option>
     <option value="hip-hop">Hip-Hop</option>
-    <option value="rock">Rock</option>
     <option value="k-pop">K-Pop</option>
     <option value="latin">Latin</option>
   </select>
+  <button onclick="getGenreTrendsOverYears()">Genre-Trends anzeigen</button>
 
-  <!-- Button for fetching trend data -->
-  <button onclick="getGenreTrendsOverYears()">Entwicklung anzeigen</button>
-
-  <!-- Canvas for the chart showing genre trends -->
+  <!-- Bereich für die Anzeige der Genre-Trends Grafik -->
   <canvas id="genreChart" width="400" height="200"></canvas>
 
-  <!-- Include the JavaScript file -->
+  <!-- Verknüpfung zum JavaScript-File -->
   <script src="events.js"></script>
 </body>
 </html>

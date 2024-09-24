@@ -2,6 +2,10 @@
 const clientId = '4f74336e66a941a3a7d5285f5e207e66'; // Ersetze mit deiner Spotify Client ID
 const clientSecret = '4217d8cc611a4e8bb80638e1b0d1d4c3'; // Ersetze mit deinem Spotify Client Secret
 const predictHQApiKey = 'f820AjMrX5hUl1bIfE21o_rinojJens6eo3c0hkI'; // PredictHQ API-Key
+const lastFmApiKey = '3c59c3be0246ec258433f3d598ddce36'; // Last.fm API Key
+
+// Variable to store the chart instance
+let genreChartInstance;
 
 // Spotify: Get access token via Client Credentials Flow
 async function getSpotifyToken() {
@@ -25,7 +29,7 @@ function searchEventsAndTopInSelectedCountry() {
   const genre = document.getElementById('genre').value;
   const country = document.getElementById('country').value;
 
-  // Search for top songs, top artists, and events for the selected country and genre
+  // Search events, top songs, and top artists
   searchTopSongsInSelectedCountry(country, genre);
   searchTopArtistsInSelectedCountry(country, genre);
   searchEvents(genre, country);
@@ -148,62 +152,51 @@ function displayEvents(data) {
   }
 }
 
-// Fetch and show genre trends across continents for the last 10 years
+// Last.fm: Get historical genre trends over continents
 async function getGenreTrendsOverYears() {
-  const token = await getSpotifyToken();
-  const genre = document.getElementById('trendGenre').value; // Get selected genre
-  const continents = ['EU', 'NA', 'SA', 'AS', 'AU', 'AF']; // Europe, North America, South America, Asia, Australia, Africa
+  const genre = document.getElementById('trendGenre').value;
 
-  const trendData = {}; // Store data for each continent
+  const continents = ['Europe', 'North America', 'South America', 'Asia', 'Australia', 'Africa'];
+  const trendsData = {};
 
   for (let continent of continents) {
-    trendData[continent] = [];
+    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag=${genre}&api_key=${lastFmApiKey}&format=json&limit=10`);
+    const data = await response.json();
 
-    for (let year = 2014; year <= 2023; year++) {
-      // Assume API provides data per year, this is a placeholder to simulate data for years
-      const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&market=${continent}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
-
-      const data = await response.json();
-
-      // Store the count of tracks (as a proxy for popularity)
-      trendData[continent].push(data.tracks ? data.tracks.items.length : 0);
-    }
+    const totalListeners = data.topartists.artist.reduce((acc, artist) => acc + parseInt(artist.listeners), 0);
+    trendsData[continent] = totalListeners;
   }
 
-  renderGenreTrendChart(trendData);
+  displayGenreTrendChart(trendsData);
 }
 
-// Render chart to show streaming trends
-function renderGenreTrendChart(trendData) {
+// Display the genre trend chart using Chart.js
+function displayGenreTrendChart(trendsData) {
   const ctx = document.getElementById('genreChart').getContext('2d');
 
-  const data = {
-    labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], // Last 10 years
-    datasets: []
-  };
-
-  // Populate datasets for each continent
-  for (let continent in trendData) {
-    data.datasets.push({
-      label: `${continent}`,
-      data: trendData[continent],
-      borderColor: getRandomColor(),
-      fill: false
-    });
+  // Destroy the previous chart instance if it exists
+  if (genreChartInstance) {
+    genreChartInstance.destroy();
   }
 
-  new Chart(ctx, {
-    type: 'line',
-    data: data
+  genreChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(trendsData),
+      datasets: [{
+        label: 'Listeners by Continent',
+        data: Object.values(trendsData),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
   });
-}
-
-// Helper function to generate random colors for the chart
-function getRandomColor() {
-  return `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`;
 }
