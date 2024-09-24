@@ -1,12 +1,14 @@
+<html>
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Musik-Events suchen</title>
+  <title>Musik-Events und Spotify Integration</title>
 </head>
 <body>
-  <h1>Finde Musik-Events nach Musikrichtung und Land</h1>
+  <!-- Bereich für die Musikevents-Suche -->
+  <h1>Finde Musik-Events, Top 3 Songs und Top 3 Künstler nach Musikrichtung und Land</h1>
 
   <!-- Dropdown für Musikrichtungen -->
   <label for="genre">Musikrichtung auswählen:</label>
@@ -19,16 +21,26 @@
   <!-- Dropdown für Länder -->
   <label for="country">Land auswählen:</label>
   <select id="country">
-    <option value="US">USA</option>
     <option value="CH">Schweiz</option>
+    <option value="US">USA</option>
     <option value="BR">Brasilien</option>
     <option value="TH">Thailand</option>
   </select>
 
-  <button onclick="searchEvents()">Events suchen</button>
+  <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
+  <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
 
-  <!-- Bereich, in dem die Ergebnisse angezeigt werden -->
+  <!-- Bereich für die Anzeige der Musikevents -->
+  <h2>Musikevents</h2>
   <div id="result"></div>
+
+  <!-- Bereich für die Anzeige der Top-Songs -->
+  <h2>Top 3 Songs</h2>
+  <div id="spotify-songs"></div>
+
+  <!-- Bereich für die Anzeige der Top-Künstler -->
+  <h2>Top 3 Künstler</h2>
+  <div id="spotify-artists"></div>
 
   <!-- Verknüpfung zum JavaScript-File -->
   <script src="events.js"></script>
