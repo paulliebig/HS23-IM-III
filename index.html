@@ -6,7 +6,6 @@
   <title>Musik-Events und Spotify Integration</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js for graph -->
   <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
   <!-- Bereich für die Musikevents-Suche -->
@@ -17,7 +16,10 @@
   <select id="genre">
     <option value="rock">Rock</option>
     <option value="pop">Pop</option>
-    <option value="schlager">Schlager</option>
+    <option value="hip-hop">Hip-Hop</option>
+    <option value="electronic">Electronic</option>
+    <option value="jazz">Jazz</option>
+    <option value="metal">Metal</option>
   </select>
 
   <!-- Dropdown für Länder -->
@@ -26,7 +28,10 @@
     <option value="CH">Schweiz</option>
     <option value="US">USA</option>
     <option value="BR">Brasilien</option>
-    <option value="TH">Thailand</option>
+    <option value="DE">Deutschland</option>
+    <option value="GB">Großbritannien</option>
+    <option value="JP">Japan</option>
+    <option value="worldwide">Weltweit</option>
   </select>
 
   <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
@@ -44,8 +49,8 @@
   <h2>Top 3 Künstler</h2>
   <div id="spotify-artists"></div>
 
-  <!-- Bereich für die Abfrage der Musik-Genre-Trends über Kontinente -->
-  <h1>Entwicklung der Musikgenres über die Kontinente</h1>
+  <!-- Bereich für die Abfrage der Musik-Genre-Trends über die Jahre -->
+  <h1>Entwicklung der Musikgenres Weltweit</h1>
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
   <select id="trendGenre">
     <option value="rock">Rock</option>
@@ -58,6 +63,22 @@
 
   <!-- Bereich für die Anzeige der Genre-Trends Grafik -->
   <canvas id="genreChart" width="400" height="200"></canvas>
+
+  <!-- Bereich für die Abfrage der Spotify-Genre-Popularität -->
+  <h1>Spotify Genre Streams Analyse</h1>
+  <label for="streamCountry">Land auswählen (für Genre Streams):</label>
+  <select id="streamCountry">
+    <option value="worldwide">Weltweit</option>
+    <option value="US">USA</option>
+    <option value="DE">Deutschland</option>
+    <option value="GB">Großbritannien</option>
+    <option value="BR">Brasilien</option>
+    <option value="JP">Japan</option>
+  </select>
+  <button onclick="searchTopGenresStreams()">Genre Streams anzeigen</button>
+
+  <!-- Bereich für die Anzeige des Spotify-Genre-Streams Balkendiagramms -->
+  <canvas id="genreStreamChart" width="400" height="200"></canvas>
 
   <!-- Verknüpfung zum JavaScript-File -->
   <script src="events.js"></script>
