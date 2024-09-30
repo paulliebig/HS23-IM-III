@@ -14,32 +14,36 @@ h1, h2 {
 /* Container for the analytics */
 #analytics-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 50px;
   margin-top: 50px;
 }
 
 /* Box for top songs and top artists */
 .graph-container {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(211, 211, 211, 0.15); /* Light grey box effect */
   padding: 20px;
   border-radius: 10px;
+  border: 1px solid lightgray;
+  width: 350px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  width: 300px;
 }
 
 .graph-title {
   margin-bottom: 20px;
   font-size: 1.2em;
+  color: #fff;
 }
 
-/* Bars for top 3 songs and artists */
+/* Center the bars in each graph container */
 .bar-chart {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: flex-end;
   height: 200px;
 }
 
+/* Bars for top 3 songs and artists */
 .bar {
   width: 50px;
   background: linear-gradient(180deg, #72b4ff, #006aff);
@@ -67,7 +71,7 @@ h1, h2 {
 
 /* Style for the events section */
 #result {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(211, 211, 211, 0.15); /* Light grey box effect */
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -79,10 +83,6 @@ h1, h2 {
 
 #result p {
   margin: 10px 0;
-}
-
-#genreChart {
-  margin-top: 40px;
 }
 
 /* Placeholder lines for events */

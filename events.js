@@ -4,7 +4,6 @@ const clientSecret = '4217d8cc611a4e8bb80638e1b0d1d4c3'; // Ersetze mit deinem S
 const predictHQApiKey = 'f820AjMrX5hUl1bIfE21o_rinojJens6eo3c0hkI'; // PredictHQ API-Key
 const lastFmApiKey = '3c59c3be0246ec258433f3d598ddce36'; // Last.fm API Key
 
-// Variable to store the chart instance
 let genreChartInstance;
 
 // Spotify: Get access token via Client Credentials Flow
@@ -81,11 +80,19 @@ function displayTopArtists(topArtistsData) {
   resultDiv.innerHTML = ''; // Clear previous results
 
   if (topArtistsData.artists && topArtistsData.artists.items.length > 0) {
+    let artistBarHeights = [80, 120, 160]; // Heights of the bars
+
+    resultDiv.innerHTML += '<div class="bar-chart">';
     topArtistsData.artists.items.forEach((artist, index) => {
       if (index < 3) {
-        resultDiv.innerHTML += `<p><b>${artist.name}</b><br>Link: <a href="${artist.external_urls.spotify}" target="_blank">${artist.external_urls.spotify}</a></p>`;
+        resultDiv.innerHTML += `
+          <div class="bar" style="height: ${artistBarHeights[index]}px;" onclick="window.open('${artist.external_urls.spotify}')">
+            <p>${artist.name}</p>
+          </div>
+        `;
       }
     });
+    resultDiv.innerHTML += '</div>';
   } else {
     resultDiv.innerHTML += '<p>No artists found</p>';
   }
@@ -97,11 +104,19 @@ function displayTopSongs(topTracksData) {
   resultDiv.innerHTML = ''; // Clear previous results
 
   if (topTracksData.tracks && topTracksData.tracks.items.length > 0) {
+    let songBarHeights = [80, 120, 160]; // Heights of the bars
+
+    resultDiv.innerHTML += '<div class="bar-chart">';
     topTracksData.tracks.items.forEach((track, index) => {
       if (index < 3) {
-        resultDiv.innerHTML += `<p><b>${track.name}</b> by ${track.artists.map(artist => artist.name).join(', ')}<br>Link: <a href="${track.external_urls.spotify}" target="_blank">${track.external_urls.spotify}</a></p>`;
+        resultDiv.innerHTML += `
+          <div class="bar" style="height: ${songBarHeights[index]}px;" onclick="window.open('${track.external_urls.spotify}')">
+            <p>${track.name}</p>
+          </div>
+        `;
       }
     });
+    resultDiv.innerHTML += '</div>';
   } else {
     resultDiv.innerHTML += '<p>No songs found</p>';
   }
@@ -131,72 +146,24 @@ function searchEvents(genre, country) {
   });
 }
 
-// Display events
-function displayEvents(data) {
+// Display events for selected country and genre
+function displayEvents(eventsData) {
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = ''; // Clear previous results
 
-  const currentDate = new Date();
-  const futureEvents = data.results.filter(event => new Date(event.start) > currentDate);
-
-  futureEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
-
-  if (futureEvents.length > 0) {
-    futureEvents.forEach(event => {
-      const location = event.entity ? event.entity.name : 'Location unavailable';
-      const date = event.start ? new Date(event.start).toLocaleDateString() : 'Date unavailable';
-      resultDiv.innerHTML += `<p><b>${event.title}</b><br>Location: ${location}<br>Date: ${date}</p>`;
+  if (eventsData && eventsData.results.length > 0) {
+    eventsData.results.forEach(event => {
+      const eventHTML = `
+        <div>
+          <h4>${event.title}</h4>
+          <p>Date: ${new Date(event.start).toLocaleDateString()}</p>
+          <p>Location: ${event.location[0]}, ${event.location[1]}</p>
+        </div>
+        <hr>
+      `;
+      resultDiv.innerHTML += eventHTML;
     });
   } else {
-    resultDiv.innerHTML = '<p>No upcoming events found</p>';
+    resultDiv.innerHTML += '<p>No events found</p>';
   }
-}
-
-// Last.fm: Get historical genre trends over continents
-async function getGenreTrendsOverYears() {
-  const genre = document.getElementById('trendGenre').value;
-
-  const continents = ['Europe', 'North America', 'South America', 'Asia', 'Australia', 'Africa'];
-  const trendsData = {};
-
-  for (let continent of continents) {
-    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag=${genre}&api_key=${lastFmApiKey}&format=json&limit=10`);
-    const data = await response.json();
-
-    const totalListeners = data.topartists.artist.reduce((acc, artist) => acc + parseInt(artist.listeners), 0);
-    trendsData[continent] = totalListeners;
-  }
-
-  displayGenreTrendChart(trendsData);
-}
-
-// Display the genre trend chart using Chart.js
-function displayGenreTrendChart(trendsData) {
-  const ctx = document.getElementById('genreChart').getContext('2d');
-
-  // Destroy the previous chart instance if it exists
-  if (genreChartInstance) {
-    genreChartInstance.destroy();
-  }
-
-  genreChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(trendsData),
-      datasets: [{
-        label: 'Listeners by Continent',
-        data: Object.values(trendsData),
-        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
 }
