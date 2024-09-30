@@ -1,0 +1,109 @@
+/* General body and layout styles */
+body {
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle, rgba(20, 20, 20, 1) 0%, rgba(18, 18, 18, 1) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 20px;
+}
+
+h1, h2 {
+  color: #ffffff;
+}
+
+/* Container for the analytics */
+#analytics-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 50px;
+}
+
+/* Box for top songs and top artists */
+.graph-container {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 300px;
+}
+
+.graph-title {
+  margin-bottom: 20px;
+  font-size: 1.2em;
+}
+
+/* Bars for top 3 songs and artists */
+.bar-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+}
+
+.bar {
+  width: 50px;
+  background: linear-gradient(180deg, #72b4ff, #006aff);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bar p {
+  position: absolute;
+  bottom: -25px;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.bar:hover {
+  transform: scale(1.05);
+}
+
+/* Style for the events section */
+#result {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  margin-top: 20px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#result p {
+  margin: 10px 0;
+}
+
+#genreChart {
+  margin-top: 40px;
+}
+
+/* Placeholder lines for events */
+.event-placeholder {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.4);
+  margin: 10px 0;
+}
+
+/* Button style */
+button {
+  background: linear-gradient(180deg, #72b4ff, #006aff);
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1em;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(180deg, #62a4ff, #0059ff);
+}
