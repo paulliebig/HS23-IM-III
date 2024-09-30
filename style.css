@@ -1,109 +1,146 @@
-/* General body and layout styles */
+/* General body styles */
 body {
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle, rgba(20, 20, 20, 1) 0%, rgba(18, 18, 18, 1) 100%);
-  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  background-color: #0e0e0e;
+  color: white;
   text-align: center;
   padding: 20px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
+/* Headings */
 h1, h2 {
-  color: #ffffff;
-}
-
-/* Container for the analytics */
-#analytics-container {
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-  margin-top: 50px;
-}
-
-/* Box for top songs and top artists */
-.graph-container {
-  background-color: rgba(211, 211, 211, 0.15); /* Light grey box effect */
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid lightgray;
-  width: 350px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.graph-title {
+  color: white;
   margin-bottom: 20px;
-  font-size: 1.2em;
-  color: #fff;
 }
 
-/* Center the bars in each graph container */
-.bar-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 200px;
+/* Dropdowns */
+label, select {
+  color: white;
+  margin-right: 10px;
 }
 
-/* Bars for top 3 songs and artists */
-.bar {
-  width: 50px;
-  background: linear-gradient(180deg, #72b4ff, #006aff);
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.bar p {
-  position: absolute;
-  bottom: -25px;
-  color: #fff;
-  font-size: 12px;
-  text-align: center;
-  width: 100%;
-}
-
-.bar:hover {
-  transform: scale(1.05);
-}
-
-/* Style for the events section */
-#result {
-  background-color: rgba(211, 211, 211, 0.15); /* Light grey box effect */
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  margin-top: 20px;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#result p {
-  margin: 10px 0;
-}
-
-/* Placeholder lines for events */
-.event-placeholder {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.4);
-  margin: 10px 0;
-}
-
-/* Button style */
-button {
-  background: linear-gradient(180deg, #72b4ff, #006aff);
+select {
+  background-color: #222;
+  color: white;
   border: none;
-  color: #fff;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+/* Button for fetching data */
+button {
+  background: linear-gradient(45deg, #6a5eff, #4ea3ff);
+  color: white;
+  border: none;
   padding: 10px 20px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 1em;
-  transition: background 0.3s ease;
+  border-radius: 25px;
+  font-size: 16px;
+  transition: 0.3s ease;
 }
 
 button:hover {
-  background: linear-gradient(180deg, #62a4ff, #0059ff);
+  background: linear-gradient(45deg, #4ea3ff, #6a5eff);
+  transform: scale(1.05);
+}
+
+/* Main container for the Top Songs and Artists */
+.bar-chart {
+  display: flex;
+  justify-content: space-around; /* Adds equal spacing between bars */
+  align-items: flex-end;
+  height: 200px;
+  margin: 20px auto;
+  width: 80%;
+  max-width: 600px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Individual bars for songs/artists */
+.bar {
+  background: linear-gradient(180deg, #6a5eff, #4ea3ff);
+  width: 60px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.bar:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
+.bar p {
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+  padding: 5px;
+}
+
+/* Top songs and artists section */
+#spotify-songs, #spotify-artists {
+  margin-bottom: 40px;
+}
+
+#spotify-songs p, #spotify-artists p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Event Section */
+#result {
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+}
+
+#result div {
+  margin: 10px 0;
+}
+
+#result h4 {
+  font-size: 18px;
+  color: #6a5eff;
+}
+
+#result p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+/* Button for analytics */
+#show-analytics {
+  background: linear-gradient(45deg, #6a5eff, #4ea3ff);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  cursor: pointer;
+  border-radius: 30px;
+  font-size: 18px;
+  margin-top: 20px;
+  transition: 0.3s ease;
+}
+
+#show-analytics:hover {
+  background: linear-gradient(45deg, #4ea3ff, #6a5eff);
+  transform: scale(1.05);
+}
+
+/* Canvas chart for genre trends */
+canvas {
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
 }
