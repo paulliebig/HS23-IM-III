@@ -9,8 +9,9 @@
 </head>
 <body>
   <!-- Bereich für die Musikevents-Suche -->
-  <h1>Finde Musik-Events, Top 3 Songs und Top 3 Künstler nach Musikrichtung und Land</h1>
+  <h1>Musilytics</h1>
 
+  <div class="search">
   <!-- Dropdown für Musikrichtungen -->
   <label for="genre">Musikrichtung auswählen:</label>
   <select id="genre">
@@ -34,12 +35,13 @@
     <option value="worldwide">Weltweit</option>
   </select>
 
-  <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
-  <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
+    <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
+    <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
+  </div>
 
-  <!-- Bereich für die Anzeige der Musikevents -->
-  <h2>Musikevents</h2>
-  <div id="result"></div>
+
+
+  
 
   <!-- Bereich für die Anzeige der Top-Songs -->
   <h2>Top 3 Songs</h2>
@@ -49,8 +51,12 @@
   <h2>Top 3 Künstler</h2>
   <div id="spotify-artists"></div>
 
+  <!-- Bereich für die Anzeige der Musikevents -->
+  <h2>Musikevents</h2>
+  <div id="result"></div>
+
   <!-- Bereich für die Abfrage der Musik-Genre-Trends über die Jahre -->
-  <h1>Entwicklung der Musikgenres Weltweit</h1>
+  <h2>Entwicklung der Musikgenres Weltweit</h2>
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
   <select id="trendGenre">
     <option value="rock">Rock</option>
@@ -65,7 +71,7 @@
   <canvas id="genreChart" width="400" height="200"></canvas>
 
   <!-- Bereich für die Abfrage der Spotify-Genre-Popularität -->
-  <h1>Spotify Genre Streams Analyse</h1>
+  <h2>Spotify Genre Streams Analyse</h2>
   <label for="streamCountry">Land auswählen (für Genre Streams):</label>
   <select id="streamCountry">
     <option value="worldwide">Weltweit</option>
