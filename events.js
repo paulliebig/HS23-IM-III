@@ -6,6 +6,9 @@ const predictHQApiKey = 'f820AjMrX5hUl1bIfE21o_rinojJens6eo3c0hkI'; // PredictHQ
 let genreStreamChartInstance; // Für die Spotify-Genre-Popularitätsanalyse
 let genreTrendChartInstance;  // Für die Entwicklung der Genres
 
+let selectedCountry = ''; // Gespeicherte Auswahl des Landes
+
+
 // Subgenres definieren für verschiedene Genres
 const subgenresMap = {
   rock: ['rock', 'classic rock', 'alternative rock', 'hard rock', 'indie rock', 'progressive rock', 'soft rock'],
@@ -90,7 +93,7 @@ async function calculateAverageGenrePopularity(genre, country, token) {
   return averagePopularity; // Durchschnittliche Popularität für das Genre
 }
 
-// Display the average genre popularity as a bar chart with adjusted y-axis scale
+// Display the average genre popularity as a bar chart
 function displayAverageGenrePopularityChart(genrePopularity) {
   const ctx = document.getElementById('genreStreamChart').getContext('2d');
 
@@ -127,16 +130,15 @@ function displayAverageGenrePopularityChart(genrePopularity) {
         y: {
           title: {
             display: true,
-            text: 'Durchschnittliche Popularität (60-100)'
+            text: 'Durchschnittliche Popularität (0-100)'
           },
-          min: 60,  // Setzt das Minimum auf 60
-          max: 100  // Setzt das Maximum auf 100
+          min: 0,
+          max: 100
         }
       }
     }
   });
 }
-
 
 // MusicBrainz: Get Genre Trends over the years using global artist release data with pagination and subgenre support
 async function getGenreTrendsOverYears() {
@@ -263,7 +265,7 @@ function displayGenreTrends(years, values) {
 async function searchEventsAndTopInSelectedCountry() {
   const genre = document.getElementById('genre').value;
   const country = document.getElementById('country').value;
-  
+
   searchTopSongsInSelectedCountry(country, genre);
   searchTopArtistsInSelectedCountry(country, genre);
   searchEvents(genre, country);
@@ -381,3 +383,47 @@ function displayFutureEvents(eventsData) {
     resultDiv.innerHTML = '<p>No events found</p>';
   }
 }
+
+
+
+
+
+
+
+
+
+// Karte initialisieren, Zoomsteuerung und Verschieben deaktiviert
+const map = L.map('map', { zoomControl: false, dragging: false }).setView([20, 0], 2);
+
+// OpenStreetMap-Kacheln hinzufügen
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Deaktiviere Zoom über Doppelklick und Mausrad
+map.scrollWheelZoom.disable();
+map.doubleClickZoom.disable();
+
+// GeoJSON-Datei für Ländergrenzen laden
+fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+  .then(response => response.json())
+  .then(geojsonData => {
+    // Ländergrenzen zur Karte hinzufügen und Klick-Events aktivieren
+    L.geoJSON(geojsonData, {
+      style: function (feature) {
+        return {
+          color: "#3388ff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.7
+        };
+      },
+      onEachFeature: function (feature, layer) {
+        layer.on('click', function () {
+          // Aktion bei Klick: Länderdaten im Alert anzeigen
+          alert('Gewähltes Land: ' + feature.properties.name);
+        });
+      }
+    }).addTo(map);
+  })
+  .catch(error => console.error('Fehler beim Laden der GeoJSON-Daten:', error));
