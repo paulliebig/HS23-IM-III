@@ -262,9 +262,8 @@ function displayGenreTrends(years, values) {
 }
 
 // Funktionen zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
-async function searchEventsAndTopInSelectedCountry() {
+async function searchEventsAndTopInSelectedCountry(country) {
   const genre = document.getElementById('genre').value;
-  const country = document.getElementById('country').value;
 
   searchTopSongsInSelectedCountry(country, genre);
   searchTopArtistsInSelectedCountry(country, genre);
@@ -390,7 +389,8 @@ function displayFutureEvents(eventsData) {
 
 
 
-
+// Liste aller Länder, die wir wollen
+const countries = [ 'USA', 'Deutschland', 'Großbritannien', 'Brasilien', 'Japan' ];
 
 // Karte initialisieren, Zoomsteuerung und Verschieben deaktiviert
 const map = L.map('map', { zoomControl: false, dragging: false }).setView([20, 0], 2);
@@ -408,6 +408,9 @@ map.doubleClickZoom.disable();
 fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
   .then(response => response.json())
   .then(geojsonData => {
+    geojsonData.features = geojsonData.features.filter(feature => countries.includes(feature.properties.name));
+    console.log(geojsonData.features);
+
     // Ländergrenzen zur Karte hinzufügen und Klick-Events aktivieren
     L.geoJSON(geojsonData, {
       style: function (feature) {
@@ -421,7 +424,8 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
       onEachFeature: function (feature, layer) {
         layer.on('click', function () {
           // Aktion bei Klick: Länderdaten im Alert anzeigen
-          alert('Gewähltes Land: ' + feature.properties.name);
+          alert('Gewähltes Land: ' + feature.id.slice(0, 2));
+          searchEventsAndTopInSelectedCountry(feature.id.slice(0, 2));
         });
       }
     }).addTo(map);
