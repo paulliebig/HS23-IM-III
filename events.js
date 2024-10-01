@@ -38,7 +38,7 @@ async function getSpotifyToken() {
 
 // Main function to trigger the Spotify genre stream analysis
 async function searchTopGenresStreams() {
-  const country = document.getElementById('country').value; // Get selected country
+  const country = document.getElementById('streamCountry').value; // Get selected country
   const token = await getSpotifyToken();
 
   // Erstelle ein leeres Objekt, um die durchschnittliche Popularität pro Genre zu speichern
@@ -90,7 +90,7 @@ async function calculateAverageGenrePopularity(genre, country, token) {
   return averagePopularity; // Durchschnittliche Popularität für das Genre
 }
 
-// Display the average genre popularity as a bar chart
+// Display the average genre popularity as a bar chart with adjusted y-axis scale
 function displayAverageGenrePopularityChart(genrePopularity) {
   const ctx = document.getElementById('genreStreamChart').getContext('2d');
 
@@ -127,15 +127,16 @@ function displayAverageGenrePopularityChart(genrePopularity) {
         y: {
           title: {
             display: true,
-            text: 'Durchschnittliche Popularität (0-100)'
+            text: 'Durchschnittliche Popularität (60-100)'
           },
-          min: 0,
-          max: 100
+          min: 60,  // Setzt das Minimum auf 60
+          max: 100  // Setzt das Maximum auf 100
         }
       }
     }
   });
 }
+
 
 // MusicBrainz: Get Genre Trends over the years using global artist release data with pagination and subgenre support
 async function getGenreTrendsOverYears() {
@@ -332,10 +333,11 @@ function displayTopSongs(topTracksData) {
   }
 }
 
-// PredictHQ: Search for events by music genre and country
+// PredictHQ: Search for events by music genre and country, only future events
 function searchEvents(genre, country) {
-  const url = `https://api.predicthq.com/v1/events/?q=${encodeURIComponent(genre)}&country=${encodeURIComponent(country)}`;
-  
+  const currentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const url = `https://api.predicthq.com/v1/events/?q=${encodeURIComponent(genre)}&country=${encodeURIComponent(country)}&start.gte=${currentDate}&sort=start`;
+
   fetch(url, {
     method: 'GET',
     headers: {
@@ -345,7 +347,7 @@ function searchEvents(genre, country) {
   })
   .then(response => response.json())
   .then(data => {
-    displayEvents(data);
+    displayFutureEvents(data); // Show only future events
   })
   .catch(error => {
     console.error('Error fetching events:', error);
@@ -353,22 +355,29 @@ function searchEvents(genre, country) {
   });
 }
 
-// Display events for selected country and genre
-function displayEvents(eventsData) {
+// Display future events only (max 5 events)
+function displayFutureEvents(eventsData) {
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = ''; // Clear previous results
 
-  if (eventsData && eventsData.results.length > 0) {
-    eventsData.results.forEach(event => {
-      resultDiv.innerHTML += `
+  if (eventsData && eventsData.results && eventsData.results.length > 0) {
+    // Display up to 5 future events
+    eventsData.results.slice(0, 5).forEach(event => {
+      const eventHTML = `
         <div>
           <h4>${event.title}</h4>
           <p>Date: ${new Date(event.start).toLocaleDateString()}</p>
-          <p>Location: ${event.location[0]}, ${event.location[1]}</p>
+          <p>Location: ${event.location ? event.location.join(', ') : 'Location not available'}</p>
         </div>
         <hr>`;
+      resultDiv.innerHTML += eventHTML;
     });
+
+    // If no events are returned
+    if (eventsData.results.length === 0) {
+      resultDiv.innerHTML = '<p>No upcoming events found</p>';
+    }
   } else {
-    resultDiv.innerHTML += '<p>No events found</p>';
+    resultDiv.innerHTML = '<p>No events found</p>';
   }
 }
