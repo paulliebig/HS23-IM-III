@@ -40,9 +40,18 @@ async function getSpotifyToken() {
   return data.access_token; // Return access token
 }
 
-// Main function to trigger the Spotify genre stream analysis
 async function searchTopGenresStreams() {
-  const country = document.getElementById('streamCountry').value; // Get selected country
+  let country = document.getElementById('streamCountry').value; // Hol das ausgewählte Land
+  let genre = document.getElementById('genre').value; // Hol das ausgewählte Genre
+
+  // Standardwerte setzen, falls kein Land oder Genre ausgewählt wurde
+  if (!country) {
+    country = 'CH'; // Standardmäßig Schweiz
+  }
+  if (!genre) {
+    genre = 'rock'; // Standardmäßig Rock
+  }
+
   const token = await getSpotifyToken();
 
   // Erstelle ein leeres Objekt, um die durchschnittliche Popularität pro Genre zu speichern
@@ -61,6 +70,7 @@ async function searchTopGenresStreams() {
   // Zeichne das Balkendiagramm basierend auf der durchschnittlichen Popularität der Genres
   displayAverageGenrePopularityChart(genrePopularity);
 }
+
 
 // Spotify: Fetch and calculate average popularity points for a genre and country
 async function calculateAverageGenrePopularity(genre, country, token) {
@@ -438,14 +448,23 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
   .catch(error => console.error('Fehler beim Laden der GeoJSON-Daten:', error));
 
 
-  // Funktion für Standard-Einträge (z.B. weltweit und Rock)
-window.onload = function() {
-  const defaultCountry = 'CH';  // Standardmäßig weltweit
-  const defaultGenre = 'rock';  // Standardmäßig Rock-Genre
 
-  // Zeige Standarddaten für Top-Künstler, Songs und Events
-  searchEventsAndTopInSelectedCountry(defaultCountry, defaultGenre);
-};
+  // Funktion für Standard-Einträge (z.B. weltweit und Rock)
+  window.onload = function() {
+    const defaultCountry = 'CH';  // Standardmäßig Schweiz
+    const defaultGenre = 'rock';  // Standardmäßig Rock-Genre
+  
+    // Zeige Standarddaten für Top-Künstler, Songs und Events
+    searchEventsAndTopInSelectedCountry(defaultCountry, defaultGenre);
+  
+    // Zeige die Standard-Spotify-Genre-Streams-Analyse für die Schweiz und Rock
+    document.getElementById('streamCountry').value = 'CH';
+    document.getElementById('genre').value = 'rock';
+    searchTopGenresStreams();
+  
+    // Zeige die Standard-Musikentwicklungs-Trends für die Schweiz und Rock
+    getGenreTrendsOverYears();
+  };
 
 // Funktion zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
 async function searchEventsAndTopInSelectedCountry(country, genre) {
