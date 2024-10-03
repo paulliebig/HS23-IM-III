@@ -390,7 +390,7 @@ function displayFutureEvents(eventsData) {
 
 
 // Liste aller Länder, die wir wollen
-const countries = [ 'USA', 'Deutschland', 'Großbritannien', 'Brasilien', 'Japan' ];
+const countries = [ 'United States of America', 'Germany', 'United Kingdom', 'Brazil', 'Japan', 'Switzerland' ];
 
 // Karte initialisieren, Zoomsteuerung und Verschieben deaktiviert
 const map = L.map('map', { zoomControl: false, dragging: false }).setView([20, 0], 2);
