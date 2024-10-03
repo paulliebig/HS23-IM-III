@@ -3,6 +3,7 @@ const clientId = '4f74336e66a941a3a7d5285f5e207e66'; // Ersetze mit deiner Spoti
 const clientSecret = '4217d8cc611a4e8bb80638e1b0d1d4c3'; // Ersetze mit deinem Spotify Client Secret
 const predictHQApiKey = 'f820AjMrX5hUl1bIfE21o_rinojJens6eo3c0hkI'; // PredictHQ API-Key
 
+
 let genreStreamChartInstance; // Für die Spotify-Genre-Popularitätsanalyse
 let genreTrendChartInstance;  // Für die Entwicklung der Genres
 
@@ -132,7 +133,7 @@ function displayAverageGenrePopularityChart(genrePopularity) {
             display: true,
             text: 'Durchschnittliche Popularität (0-100)'
           },
-          min: 0,
+          min: 60,
           max: 100
         }
       }
@@ -143,7 +144,7 @@ function displayAverageGenrePopularityChart(genrePopularity) {
 // MusicBrainz: Get Genre Trends over the years using global artist release data with pagination and subgenre support
 async function getGenreTrendsOverYears() {
   const genre = document.getElementById('trendGenre').value;
-  let subgenres = [];
+  let subgenres = subgenresMap[genre] || [genre]; // Fallback auf das Hauptgenre
 
   // Prüfe, ob es definierte Subgenres für das ausgewählte Genre gibt
   if (subgenresMap[genre]) {
@@ -224,6 +225,10 @@ function calculateFiveYearAverages(yearsMap) {
 function displayGenreTrends(years, values) {
   const ctx = document.getElementById('genreChart').getContext('2d');
 
+  // Filtere die Jahre und die entsprechenden Werte, um nur Daten bis 2020 anzuzeigen
+  const filteredYears = years.filter(year => year <= 2020);
+  const filteredValues = values.slice(0, filteredYears.length);
+
   // Überprüfe, ob ein bestehendes Diagramm vorhanden ist, und zerstöre es
   if (genreTrendChartInstance) {
     genreTrendChartInstance.destroy();
@@ -232,10 +237,10 @@ function displayGenreTrends(years, values) {
   genreTrendChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: years,
+      labels: filteredYears, // Nur gefilterte Jahre anzeigen
       datasets: [{
         label: 'Beliebtheit des Genres über Jahre (5-Jahres-Durchschnitt)',
-        data: values,
+        data: filteredValues, // Nur gefilterte Werte anzeigen
         fill: false,
         borderColor: 'rgba(75, 192, 192, 1)',
         tension: 0.1
@@ -260,6 +265,7 @@ function displayGenreTrends(years, values) {
     }
   });
 }
+
 
 // Funktionen zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
 async function searchEventsAndTopInSelectedCountry(country) {
@@ -424,10 +430,33 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
       onEachFeature: function (feature, layer) {
         layer.on('click', function () {
           // Aktion bei Klick: Länderdaten im Alert anzeigen
-          alert('Gewähltes Land: ' + feature.id.slice(0, 2));
           searchEventsAndTopInSelectedCountry(feature.id.slice(0, 2));
         });
       }
     }).addTo(map);
   })
   .catch(error => console.error('Fehler beim Laden der GeoJSON-Daten:', error));
+
+
+  // Funktion für Standard-Einträge (z.B. weltweit und Rock)
+window.onload = function() {
+  const defaultCountry = 'CH';  // Standardmäßig weltweit
+  const defaultGenre = 'rock';  // Standardmäßig Rock-Genre
+
+  // Zeige Standarddaten für Top-Künstler, Songs und Events
+  searchEventsAndTopInSelectedCountry(defaultCountry, defaultGenre);
+};
+
+// Funktion zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
+async function searchEventsAndTopInSelectedCountry(country, genre) {
+  // Default-Werte, falls nichts ausgewählt wurde
+  country = country || document.getElementById('streamCountry').value;
+  genre = genre || document.getElementById('genre').value;
+
+  searchTopSongsInSelectedCountry(country, genre);
+  searchTopArtistsInSelectedCountry(country, genre);
+  searchEvents(genre, country);
+}
+
+// Weitere bestehende Funktionen bleiben unverändert (searchTopSongsInSelectedCountry, searchTopArtistsInSelectedCountry, etc.)
+

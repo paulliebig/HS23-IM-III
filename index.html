@@ -36,11 +36,7 @@
     </select>
 
     <!-- Interaktive Karte für Länder -->
-    <label for="country">Land auswählen:</label>
     <div id="map"></div>
-
-    <!-- Button für die Abfrage der Top 3 Künstler, Top 3 Songs und Events -->
-    <button onclick="searchEventsAndTopInSelectedCountry()">Top 3 Künstler, Songs & Events anzeigen</button>
   </div>
 
   <div class="results-container">
@@ -71,15 +67,15 @@
   <h2>Musikevents</h2>
   <div id="result"></div>
 
-  <!-- Bereich für die Abfrage der Musik-Genre-Trends über die Jahre -->
-  <h2>Entwicklung der Musikgenres Weltweit</h2>
+  <!-- Dropdown für die Musikauswahl -->
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
   <select id="trendGenre">
     <option value="rock">Rock</option>
     <option value="pop">Pop</option>
     <option value="hip-hop">Hip-Hop</option>
-    <option value="k-pop">K-Pop</option>
-    <option value="latin">Latin</option>
+    <option value="electronic">Electronic</option>
+    <option value="jazz">Jazz</option>
+    <option value="metal">Metal</option>
   </select>
   <button onclick="getGenreTrendsOverYears()">Genre-Trends anzeigen</button>
 
@@ -90,11 +86,11 @@
   <h2>Spotify Genre Streams Analyse</h2>
   <label for="streamCountry">Land auswählen (für Genre Streams):</label>
   <select id="streamCountry">
-    <option value="worldwide">Weltweit</option>
     <option value="US">USA</option>
-    <option value="DE">Deutschland</option>
-    <option value="GB">Großbritannien</option>
     <option value="BR">Brasilien</option>
+    <option value="GB">Großbritannien</option>
+    <option value="DE">Deutschland</option>
+    <option value="CH">Schweiz</option>
     <option value="JP">Japan</option>
   </select>
   <button onclick="searchTopGenresStreams()">Genre Streams anzeigen</button>
@@ -108,8 +104,58 @@
   <!-- Verknüpfung zum JavaScript-File -->
   <script src="events.js"></script>
 
+  <!-- LocationIQ API zur Umwandlung von Koordinaten in Ortsnamen -->
   <script>
-    // Liste der interaktiven Länder (ISO-2 Codes)
+    const locationIQApiKey = 'pk.a00653df4d05d09645fc72e5f5839155'; // Dein LocationIQ API-Key
+
+    // Funktion zur Umwandlung von Koordinaten in Ortsnamen
+    async function getLocationName(lat, lon) {
+      const url = `https://us1.locationiq.com/v1/reverse.php?key=${locationIQApiKey}&lat=${lat}&lon=${lon}&format=json`;
+      
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.display_name;  // Gib den Ortsnamen zurück
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Ortsdaten:', error);
+        return 'Unbekannter Ort';  // Fallback bei Fehler
+      }
+    }
+
+    // Funktion zur Anzeige der Events und Umwandlung der Koordinaten
+async function displayFutureEvents(eventsData) {
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = ''; // Clear previous results
+
+  if (eventsData && eventsData.results && eventsData.results.length > 0) {
+    // Display up to 5 future events
+    for (const event of eventsData.results.slice(0, 5)) {
+      const [lon, lat] = event.location;  // Korrigiere die Reihenfolge der Koordinaten: Longitude (Ost), Latitude (Nord)
+      const locationName = await getLocationName(lat, lon);  // Koordinaten umwandeln
+
+      const eventHTML = `
+        <div>
+          <h4>${event.title}</h4>
+          <p>Date: ${new Date(event.start).toLocaleDateString()}</p>
+          <p>Location: ${locationName} (${lat}, ${lon})</p>
+        </div>
+        <hr>`;
+      resultDiv.innerHTML += eventHTML;
+    }
+
+    // If no events are returned
+    if (eventsData.results.length === 0) {
+      resultDiv.innerHTML = '<p>No upcoming events found</p>';
+    }
+  } else {
+    resultDiv.innerHTML = '<p>No events found</p>';
+  }
+}
+
+  </script>
+
+  <!-- Verknüpfe die Karten-Logik -->
+  <script>
     const interactiveCountries = ['CH', 'US', 'BR', 'DE', 'GB', 'JP'];
     let selectedCountry = ''; // Gespeicherte Auswahl des Landes
 
@@ -125,34 +171,19 @@
     fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
       .then(response => response.json())
       .then(geojsonData => {
-        // Ländergrenzen zur Karte hinzufügen und Klick-Events aktivieren
         L.geoJSON(geojsonData, {
           style: function (feature) {
-            // Interaktive Länder hervorheben
             if (interactiveCountries.includes(feature.properties.iso_a2)) {
-              return {
-                color: "#3388ff", // Blau hervorgehoben
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.7
-              };
+              return { color: "#3388ff", weight: 2, opacity: 1, fillOpacity: 0.7 };
             } else {
-              return {
-                color: "#cccccc", // Grau für nicht-interaktive Länder
-                weight: 1,
-                opacity: 0.5,
-                fillOpacity: 0.2
-              };
+              return { color: "#cccccc", weight: 1, opacity: 0.5, fillOpacity: 0.2 };
             }
           },
           onEachFeature: function (feature, layer) {
-            // Nur interaktive Länder sind klickbar
             if (interactiveCountries.includes(feature.properties.iso_a2)) {
               layer.on('click', function () {
                 selectedCountry = feature.properties.iso_a2;
                 alert('Gewähltes Land: ' + feature.properties.name);
-
-                // Die Auswahl im Dropdown "streamCountry" aktualisieren
                 document.getElementById('streamCountry').value = selectedCountry;
               });
             }
@@ -169,10 +200,8 @@
         return;
       }
 
-      // Hier kannst du die Logik für das Abrufen der Top-Künstler, Songs und Events basierend auf dem ausgewählten Land hinzufügen
       console.log('Suche Events und Daten für das Land:', selectedCountry);
     }
   </script>
-
 </body>
 </html>
