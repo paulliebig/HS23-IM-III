@@ -64,10 +64,10 @@
   </div>
 
   <!-- Bereich für die Anzeige der Musikevents -->
-  <h2>Musikevents</h2>
+  <div class="titelevents"><h2>Musikevents</h2></div>
   <div id="result"></div>
 
-  <!-- Dropdown für die Musikauswahl -->
+ <div class="alltime"> <!-- Dropdown für die Musikauswahl -->
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
   <select id="trendGenre">
     <option value="rock">Rock</option>
@@ -78,12 +78,13 @@
     <option value="metal">Metal</option>
   </select>
   <button onclick="getGenreTrendsOverYears()">Genre-Trends anzeigen</button>
+</div> 
 
   <!-- Bereich für die Anzeige der Genre-Trends Grafik -->
   <canvas id="genreChart" width="400" height="200"></canvas>
 
   <!-- Bereich für die Abfrage der Spotify-Genre-Popularität -->
-  <h2>Spotify Genre Streams Analyse</h2>
+  <div class="titelevents"><h2>Spotify Genre Streams Analyse</h2></div>
   <label for="streamCountry">Land auswählen (für Genre Streams):</label>
   <select id="streamCountry">
     <option value="US">USA</option>
