@@ -158,6 +158,8 @@ button:hover {
 /* Top songs and artists section */
 #spotify-songs, #spotify-artists {
   margin-bottom: 40px;
+  display: flex;
+  flex-direction: row;
 }
 
 #spotify-songs p, #spotify-artists p {
