@@ -15,6 +15,9 @@ function fetchGenrePopularity($genre, $country, $token) {
 
     $data = json_decode($response, true);
     $tracks = $data['tracks']['items'];
+    echo "<pre>";
+    print_r($tracks);
+    echo "</pre>";
     
     // Calculate average popularity
     $totalPopularity = 0;
@@ -27,6 +30,7 @@ function fetchGenrePopularity($genre, $country, $token) {
     return $trackCount > 0 ? $totalPopularity / $trackCount : 0;
 }
 
+include_once 'extract.php';  // Include the extract.php file
 
 $countries = ['US', 'DE', 'GB', 'BR', 'JP', 'CH'];  // List of countries
 $genres = ['rock', 'pop', 'hip-hop', 'jazz', 'metal', 'electronic'];  // Available genres
