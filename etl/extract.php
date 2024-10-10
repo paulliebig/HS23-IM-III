@@ -132,4 +132,5 @@ echo "<pre>";
 print_r($songDataArray);
 echo "</pre>";
 
+return $songDataArray;
 ?>

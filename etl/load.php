@@ -1,14 +1,9 @@
 <?php
-
-// Datenbankverbindung (PDO)
-$host = 'localhost'; im3paul.rigged-motion.com
-$dbname = 'music_database'; // Datenbankname
-$user = 'root'; // Benutzername (ändern, falls benötigt)
-$password = ''; // Passwort (ändern, falls benötigt)
+include_once 'config.php'; // Include the config.php file   
 
 try {
     // PDO-Verbindung herstellen
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $password);
+    $pdo = new PDO($dsn, $user, $password, $options);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     echo "Verbindung zur Datenbank erfolgreich hergestellt.<br>";
@@ -18,8 +13,8 @@ try {
 }
 
 // Angenommen, die Daten wurden bereits in einem Array $songDataArray in extract.php erzeugt
-include 'extract.php'; // Hiermit stellen wir sicher, dass die Daten aus extract.php verfügbar sind
-
+$songDataArray = include 'extract.php'; // Hiermit stellen wir sicher, dass die Daten aus extract.php verfügbar sind
+print_r($songDataArray);
 // SQL-Befehl zum Einfügen der Daten in die Tabelle
 $sql = "INSERT INTO music_data (country, song, rank, genre) VALUES (:country, :song, :rank, :genre)";
 

@@ -1,10 +1,10 @@
 <?php
 
 // Datenbankverbindungsparameter
-$host = 'im3paul.rigged-motion.com';
-$dbname = 'o40yx5_im3';
-$username = 'o40yx5_im3paul';
-$password = 'a3-joxYpcD6';
+$host = 'o40yx5.myd.infomaniak.com'; 
+$dbname = 'o40yx5_im3'; // Datenbankname
+$user = 'o40yx5_steve'; // Benutzername (ändern, falls benötigt)
+$password = 'n_HMadyaaO5'; // Passwort (ändern, falls benötigt)
 
 // DSN (Datenquellenname) für PDO
 $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8";
