@@ -8,12 +8,12 @@ $countries = ['US', 'DE', 'JP', 'GB', 'CH', 'BR']; // Länder
 
 // Hauptgenres basierend auf deiner JS-Definition
 $mainGenres = [
-    'rock' => ['rock'],
-    'pop' => ['pop'],
-    'hip-hop' => ['hip hop', 'rap'],
-    'jazz' => ['jazz'],
-    'metal' => ['metal'],
-    'electronic' => ['electronic', 'techno', 'house', 'trance']
+    'rock' => ['rock', 'classic rock', 'alternative rock', 'hard rock', 'indie rock', 'progressive rock', 'soft rock'],
+    'pop' => ['pop', 'indie pop', 'electropop', 'synthpop', 'dance pop', 'teen pop', 'k-pop'],
+    'hip-hop' => ['hip hop', 'trap', 'rap', 'gangsta rap', 'boom bap', 'conscious hip hop', 'crunk'],
+    'jazz' => ['jazz', 'smooth jazz', 'bebop', 'vocal jazz', 'free jazz', 'fusion jazz', 'swing'],
+    'metal' => ['metal', 'heavy metal', 'death metal', 'black metal', 'thrash metal', 'doom metal', 'power metal'],
+    'electronic' => ['electronic', 'house', 'techno', 'trance', 'dubstep', 'drum and bass', 'electro']
 ];
 
 // Funktion, um das Spotify Access Token zu erhalten
@@ -38,48 +38,18 @@ function getSpotifyToken($spotifyClientId, $spotifyClientSecret) {
     return $data['access_token'] ?? null;
 }
 
-// Funktion, um die Top 10 Songs pro Land von MusicBrainz zu holen
-function getTopSongsByCountry($country) {
-    $url = "https://musicbrainz.org/ws/2/release-group?query=tag:chart&limit=10&country=$country&fmt=json";
-    
+// Funktion, um die Top 10 Songs pro Land von Spotify zu holen
+function getTopSongsByCountryAndGenre($country, $genre, $spotifyToken) {
+    $url = "https://api.spotify.com/v1/search?q=genre:" . urlencode($genre) . "&type=track&limit=10&market=" . $country;
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: MyMusicApp/1.0 (myemail@example.com)']);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    
-    $data = json_decode($response, true);
-    return $data['release-groups'] ?? [];
-}
-
-// Funktion, um das Genre eines Songs von Spotify zu holen
-function getSongGenreFromSpotify($songName, $spotifyToken) {
-    $url = 'https://api.spotify.com/v1/search?q=' . urlencode($songName) . '&type=track&limit=1';
-
-    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $spotifyToken]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
     $response = curl_exec($ch);
     curl_close($ch);
 
     $data = json_decode($response, true);
-    if (!empty($data['tracks']['items'][0]['artists'][0]['id'])) {
-        $artistId = $data['tracks']['items'][0]['artists'][0]['id'];
-
-        // Hole die Genres des Künstlers
-        $urlArtist = "https://api.spotify.com/v1/artists/$artistId";
-        $ch = curl_init($urlArtist);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $spotifyToken]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $responseArtist = curl_exec($ch);
-        curl_close($ch);
-
-        $artistData = json_decode($responseArtist, true);
-        return implode(', ', $artistData['genres'] ?? ['Unknown']);
-    }
-    return 'Unknown';
+    return $data['tracks']['items'] ?? [];
 }
 
 // Funktion zur Vereinfachung der Genres auf Hauptgenres
@@ -100,30 +70,43 @@ $spotifyToken = getSpotifyToken($spotifyClientId, $spotifyClientSecret);
 // Array, um alle Songs und Genres zu speichern
 $songDataArray = [];
 
-// Für jedes Land die Top 10 Songs holen
+// Für jedes Land und Genre die Top 10 Songs holen
 foreach ($countries as $country) {
-    $topSongs = getTopSongsByCountry($country);
+    foreach ($mainGenres as $mainGenre => $subgenres) {
+        $topSongs = getTopSongsByCountryAndGenre($country, $mainGenre, $spotifyToken);
 
-    foreach ($topSongs as $index => $song) {
-        $songName = $song['title'] ?? 'Unknown';
-        $rank = $index + 1;
+        foreach ($topSongs as $index => $song) {
+            $songName = $song['name'] ?? 'Unknown';
+            $rank = $index + 1;
 
-        // Genre von Spotify holen
-        $songGenre = getSongGenreFromSpotify($songName, $spotifyToken);
+            // Überprüfen, ob es Künstler gibt und das erste Genre holen
+            $artistId = $song['artists'][0]['id'] ?? null;
+            $artistGenres = 'Unknown';
 
-        // Genre vereinfachen
-        $simplifiedGenre = simplifyGenre($songGenre, $mainGenres);
+            if ($artistId) {
+                // Abfrage des Künstlers, um das Genre des Künstlers zu erhalten
+                $artistUrl = "https://api.spotify.com/v1/artists/$artistId";
+                $ch = curl_init($artistUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $spotifyToken]);
+                $artistResponse = curl_exec($ch);
+                curl_close($ch);
 
-        // Song-Array mit Genre ergänzen
-        $song["genre"] = $simplifiedGenre;
+                $artistData = json_decode($artistResponse, true);
+                $artistGenres = implode(', ', $artistData['genres'] ?? ['Unknown']);
+            }
 
-        // Speichere das Ergebnis im Array
-        $songDataArray[] = [
-            "country" => $country,
-            "song_name" => $songName,
-            "rank" => $rank,
-            "genre" => $simplifiedGenre
-        ];
+            // Genre vereinfachen
+            $simplifiedGenre = simplifyGenre($artistGenres, $mainGenres);
+
+            // Song-Array mit Genre ergänzen
+            $songDataArray[] = [
+                "country" => $country,
+                "song_name" => $songName,
+                "rank" => $rank,
+                "genre" => $simplifiedGenre
+            ];
+        }
     }
 }
 
@@ -133,4 +116,5 @@ print_r($songDataArray);
 echo "</pre>";
 
 return $songDataArray;
+
 ?>
