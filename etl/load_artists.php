@@ -1,44 +1,116 @@
 <?php
-include_once 'config.php'; // Include the config.php file
 
-try {
-    // PDO-Verbindung herstellen
-    $pdo = new PDO($dsn, $user, $password, $options);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// API-Keys und Konfigurationen
+$spotifyClientId = '4f74336e66a941a3a7d5285f5e207e66'; // Ersetze mit deiner Spotify Client ID
+$spotifyClientSecret = '4217d8cc611a4e8bb80638e1b0d1d4c3'; // Ersetze mit deinem Spotify Client Secret
 
-    echo "Verbindung zur Datenbank erfolgreich hergestellt.<br>";
+$countries = ['US', 'DE', 'JP', 'GB', 'CH', 'BR']; // Länder
 
-} catch (PDOException $e) {
-    die("Datenbankverbindung fehlgeschlagen: " . $e->getMessage());
+// Hauptgenres basierend auf deiner JS-Definition
+$mainGenres = [
+    'rock' => ['rock', 'classic rock', 'alternative rock', 'hard rock', 'indie rock', 'progressive rock', 'soft rock'],
+    'pop' => ['pop', 'indie pop', 'electropop', 'synthpop', 'dance pop', 'teen pop', 'k-pop'],
+    'hip-hop' => ['hip hop', 'trap', 'rap', 'gangsta rap', 'boom bap', 'conscious hip hop', 'crunk'],
+    'jazz' => ['jazz', 'smooth jazz', 'bebop', 'vocal jazz', 'free jazz', 'fusion jazz', 'swing'],
+    'metal' => ['metal', 'heavy metal', 'death metal', 'black metal', 'thrash metal', 'doom metal', 'power metal'],
+    'electronic' => ['electronic', 'house', 'techno', 'trance', 'dubstep', 'drum and bass', 'electro']
+];
+
+// Funktion, um das Spotify Access Token zu erhalten
+function getSpotifyToken($spotifyClientId, $spotifyClientSecret) {
+    $url = 'https://accounts.spotify.com/api/token';
+    $headers = [
+        'Authorization: Basic ' . base64_encode($spotifyClientId . ':' . $spotifyClientSecret),
+        'Content-Type: application/x-www-form-urlencoded'
+    ];
+    $body = 'grant_type=client_credentials';
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+    return $data['access_token'] ?? null;
 }
 
-// Angenommen, die Daten wurden bereits in einem Array $artistDataArray in extract_artists.php erzeugt
-$artistDataArray = include 'extract_artists.php'; // Hiermit stellen wir sicher, dass die Daten aus extract_artists.php verfügbar sind
-print_r($artistDataArray);
+// Funktion, um die Top 10 Künstler pro Land und Genre von Spotify zu holen
+function getTopArtistsByCountryAndGenre($country, $genre, $spotifyToken) {
+    $url = "https://api.spotify.com/v1/search?q=genre:" . urlencode($genre) . "&type=artist&limit=10&market=" . $country;
 
-// SQL-Befehl zum Einfügen der Künstlerdaten in die Tabelle
-$sql = "INSERT INTO artist_data (country, artist, rank, genre) VALUES (:country, :artist, :rank, :genre)";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $spotifyToken]);
+    $response = curl_exec($ch);
+    curl_close($ch);
 
-$stmt = $pdo->prepare($sql);
+    $data = json_decode($response, true);
+    return $data['artists']['items'] ?? [];
+}
 
-// Durchlaufe das Array und füge jeden Künstler in die Datenbank ein
-foreach ($artistDataArray as $artistData) {
-    try {
-        // Daten binden und ausführen
-        $stmt->execute([
-            ':country' => $artistData['country'],
-            ':artist' => $artistData['artist_name'],
-            ':rank' => $artistData['rank'],
-            ':genre' => $artistData['genre']
-        ]);
+// Funktion zur Vereinfachung der Genres auf Hauptgenres
+function simplifyGenre($genres, $mainGenres) {
+    foreach ($mainGenres as $mainGenre => $keywords) {
+        foreach ($keywords as $keyword) {
+            if (stripos($genres, $keyword) !== false) {
+                return ucfirst($mainGenre); // Hauptgenre zurückgeben, wenn ein Keyword übereinstimmt
+            }
+        }
+    }
+    return 'Others'; // Standardwert, wenn kein Hauptgenre passt
+}
 
-        echo "Künstler erfolgreich eingefügt: " . $artistData['artist_name'] . " (Land: " . $artistData['country'] . ")<br>";
+// Funktion zur Anpassung des Genres basierend auf der Kategorie
+function adjustGenreBasedOnCategory($firstGenre, $category) {
+    if (stripos($firstGenre, $category) === false) {
+        // Wenn das erste Genre nicht mit der Kategorie übereinstimmt, das Genre der Kategorie hinzufügen
+        return $firstGenre . ', ' . $category;
+    }
+    return $firstGenre; // Andernfalls das erste Genre beibehalten
+}
 
-    } catch (PDOException $e) {
-        echo "Fehler beim Einfügen des Künstlers " . $artistData['artist_name'] . ": " . $e->getMessage() . "<br>";
+// Spotify Token holen
+$spotifyToken = getSpotifyToken($spotifyClientId, $spotifyClientSecret);
+
+// Array, um alle Künstler und Genres zu speichern
+$artistDataArray = [];
+
+// Für jedes Land und Genre die Top 10 Künstler holen
+foreach ($countries as $country) {
+    foreach ($mainGenres as $mainGenre => $subgenres) {
+        $topArtists = getTopArtistsByCountryAndGenre($country, $mainGenre, $spotifyToken);
+
+        foreach ($topArtists as $index => $artist) {
+            $artistName = $artist['name'] ?? 'Unknown';
+            $rank = $index + 1;
+
+            // Das erste Genre des Künstlers holen
+            $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
+            $firstGenre = $artist['genres'][0] ?? 'Unknown';
+
+            // Das Genre basierend auf der Kategorie anpassen
+            $adjustedGenre = adjustGenreBasedOnCategory($firstGenre, $mainGenre);
+
+            // Künstler-Array mit angepasstem Genre ergänzen
+            $artistDataArray[] = [
+                "country" => $country,
+                "artist_name" => $artistName,
+                "rank" => $rank,
+                "genre" => $adjustedGenre
+            ];
+        }
     }
 }
 
-echo "Alle Künstler wurden erfolgreich in die Datenbank geladen.";
+// Ausgabe des Ergebnisses (Beispiel für print_r zur Anzeige)
+echo "<pre>";
+print_r($artistDataArray);
+echo "</pre>";
+
+return $artistDataArray;
 
 ?>

@@ -39,8 +39,8 @@ function getSpotifyToken($spotifyClientId, $spotifyClientSecret) {
 }
 
 // Funktion, um die Top 10 Künstler pro Land und Genre von Spotify zu holen
-function getTopArtistsByCountryAndGenre($country, $genre, $spotifyToken, $limit = 10) {
-    $url = "https://api.spotify.com/v1/search?q=genre:" . urlencode($genre) . "&type=artist&limit=" . $limit . "&market=" . $country;
+function getTopArtistsByCountryAndGenre($country, $genre, $spotifyToken) {
+    $url = "https://api.spotify.com/v1/search?q=genre:" . urlencode($genre) . "&type=artist&limit=10&market=" . $country;
 
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -64,68 +64,45 @@ function simplifyGenre($genres, $mainGenres) {
     return 'Others'; // Standardwert, wenn kein Hauptgenre passt
 }
 
+// Funktion zur Anpassung des Genres basierend auf der Kategorie
+function adjustGenreBasedOnCategory($firstGenre, $category) {
+    if (stripos($firstGenre, $category) === false) {
+        // Wenn das erste Genre nicht mit der Kategorie übereinstimmt, das Genre der Kategorie hinzufügen
+        return $firstGenre . ', ' . $category;
+    }
+    return $firstGenre; // Andernfalls das erste Genre beibehalten
+}
+
 // Spotify Token holen
 $spotifyToken = getSpotifyToken($spotifyClientId, $spotifyClientSecret);
 
 // Array, um alle Künstler und Genres zu speichern
 $artistDataArray = [];
-$genreCount = [
-    'rock' => 0, 'pop' => 0, 'hip-hop' => 0, 'jazz' => 0, 'metal' => 0, 'electronic' => 0
-];
 
-// Funktion, um die Künstlerdaten zu sammeln, bis das Limit erreicht ist
-function collectArtists($genre, $mainGenre, $countries, $spotifyToken, &$genreCount, &$artistDataArray) {
-    foreach ($countries as $country) {
-        if ($genreCount[$mainGenre] < 60) {
-            // Versuche zuerst, die Top 10 Künstler zu holen
-            $topArtists = getTopArtistsByCountryAndGenre($country, $genre, $spotifyToken, 10);
-            foreach ($topArtists as $index => $artist) {
-                if ($genreCount[$mainGenre] >= 60) break;
-                $artistName = $artist['name'] ?? 'Unknown';
-                $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
-                
-                // Genre vereinfachen
-                $simplifiedGenre = simplifyGenre($artistGenres, [$mainGenre => [$genre]]);
-                if ($simplifiedGenre == ucfirst($mainGenre)) {
-                    // Füge Künstler zum Array hinzu, wenn Genre passt
-                    $artistDataArray[] = [
-                        "country" => $country,
-                        "artist_name" => $artistName,
-                        "genre" => $simplifiedGenre,
-                        "rank" => $index + 1
-                    ];
-                    $genreCount[$mainGenre]++;
-                }
-            }
+// Für jedes Land und Genre die Top 10 Künstler holen
+foreach ($countries as $country) {
+    foreach ($mainGenres as $mainGenre => $subgenres) {
+        $topArtists = getTopArtistsByCountryAndGenre($country, $mainGenre, $spotifyToken);
 
-            // Wenn noch weniger als 60, hole mehr Künstler, um aufzufüllen
-            if ($genreCount[$mainGenre] < 60) {
-                $additionalArtists = getTopArtistsByCountryAndGenre($country, $genre, $spotifyToken, 50);
-                foreach ($additionalArtists as $index => $artist) {
-                    if ($genreCount[$mainGenre] >= 60) break;
-                    $artistName = $artist['name'] ?? 'Unknown';
-                    $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
-                    
-                    $simplifiedGenre = simplifyGenre($artistGenres, [$mainGenre => [$genre]]);
-                    if ($simplifiedGenre == ucfirst($mainGenre)) {
-                        $artistDataArray[] = [
-                            "country" => $country,
-                            "artist_name" => $artistName,
-                            "genre" => $simplifiedGenre,
-                            "rank" => $index + 1
-                        ];
-                        $genreCount[$mainGenre]++;
-                    }
-                }
-            }
+        foreach ($topArtists as $index => $artist) {
+            $artistName = $artist['name'] ?? 'Unknown';
+            $rank = $index + 1;
+
+            // Das erste Genre des Künstlers holen
+            $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
+            $firstGenre = $artist['genres'][0] ?? 'Unknown';
+
+            // Das Genre basierend auf der Kategorie anpassen
+            $adjustedGenre = adjustGenreBasedOnCategory($firstGenre, $mainGenre);
+
+            // Künstler-Array mit angepasstem Genre ergänzen
+            $artistDataArray[] = [
+                "country" => $country,
+                "artist_name" => $artistName,
+                "rank" => $rank,
+                "genre" => $adjustedGenre
+            ];
         }
-    }
-}
-
-// Für jedes Genre Künstler sammeln, bis 60 pro Genre erreicht sind
-foreach ($mainGenres as $mainGenre => $subgenres) {
-    foreach ($subgenres as $subgenre) {
-        collectArtists($subgenre, $mainGenre, $countries, $spotifyToken, $genreCount, $artistDataArray);
     }
 }
 
