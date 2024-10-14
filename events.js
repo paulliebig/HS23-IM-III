@@ -303,36 +303,46 @@ async function searchTopSongsInSelectedCountry(country, genre) {
 
 // Spotify: Search for top artists by country and genre
 async function searchTopArtistsInSelectedCountry(country, genre) {
-  const token = await getSpotifyToken();
+  try {
+    // Fetch top artists data from your PHP endpoint
+    const topArtistsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload_artists.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}`);
 
-  const topArtistsResponse = await fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=artist&market=${country}&limit=3`, {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + token
+    console.log(topArtistsResponse);
+       
+    // Ensure the response is successful
+    if (!topArtistsResponse.ok) {
+      throw new Error(`Error fetching artists: ${topArtistsResponse.statusText}`);
     }
-  });
 
-  const topArtistsData = await topArtistsResponse.json();
-  displayTopArtists(topArtistsData);
+    // Parse the JSON data
+    const topArtistsData = await topArtistsResponse.json();
+
+    // Display the top 10 artists
+    displayTopArtists(topArtistsData);
+  } catch (error) {
+    console.error('Error fetching top artists:', error);
+    document.getElementById('spotify-artists').innerHTML = '<p>Fehler beim Abrufen der Künstlerdaten. Bitte später erneut versuchen.</p>';
+  }
 }
 
-// Display the top 3 artists
+// Function to display the top 10 artists on the webpage
 function displayTopArtists(topArtistsData) {
   const resultDiv = document.getElementById('spotify-artists');
   resultDiv.innerHTML = ''; // Clear previous results
 
-  if (topArtistsData.artists && topArtistsData.artists.items.length > 0) {
-    topArtistsData.artists.items.forEach((artist) => {
+  // Check if there are any artists in the response
+  if (Array.isArray(topArtistsData) && topArtistsData.length > 0) {
+    // Display up to 10 artists
+    topArtistsData.slice(0, 10).forEach((artist, index) => {
       resultDiv.innerHTML += `
         <div>
-          <p>${artist.name}</p>
+          <p><strong>${index + 1}. ${artist.artist}</strong> - ${artist.genre} (Rank: ${artist.rank})</p>
         </div>`;
     });
   } else {
-    resultDiv.innerHTML += '<p>No artists found</p>';
+    resultDiv.innerHTML = '<p>No artists found for the selected country and genre.</p>';
   }
 }
-
 // Display the top 3 songs
 function displayTopSongs(topTracksData) {
   const resultDiv = document.getElementById('spotify-songs');
@@ -478,4 +488,8 @@ async function searchEventsAndTopInSelectedCountry(country, genre) {
 }
 
 // Weitere bestehende Funktionen bleiben unverändert (searchTopSongsInSelectedCountry, searchTopArtistsInSelectedCountry, etc.)
+
+
+
+
 

@@ -1,5 +1,8 @@
 <?php
 
+// Einbinden der Konfigurationsdatei für die Datenbankverbindung
+require 'config.php';
+
 // API-Keys und Konfigurationen
 $spotifyClientId = '4f74336e66a941a3a7d5285f5e207e66'; // Ersetze mit deiner Spotify Client ID
 $spotifyClientSecret = '4217d8cc611a4e8bb80638e1b0d1d4c3'; // Ersetze mit deinem Spotify Client Secret
@@ -79,38 +82,47 @@ $spotifyToken = getSpotifyToken($spotifyClientId, $spotifyClientSecret);
 // Array, um alle Künstler und Genres zu speichern
 $artistDataArray = [];
 
-// Für jedes Land und Genre die Top 10 Künstler holen
-foreach ($countries as $country) {
-    foreach ($mainGenres as $mainGenre => $subgenres) {
-        $topArtists = getTopArtistsByCountryAndGenre($country, $mainGenre, $spotifyToken);
+// Verbindung zur Datenbank herstellen
+try {
+    $pdo = new PDO($dsn, $user, $password, $options);
+    echo "Verbindung zur Datenbank erfolgreich!<br>";
 
-        foreach ($topArtists as $index => $artist) {
-            $artistName = $artist['name'] ?? 'Unknown';
-            $rank = $index + 1;
+    // Für jedes Land und Genre die Top 10 Künstler holen
+    foreach ($countries as $country) {
+        foreach ($mainGenres as $mainGenre => $subgenres) {
+            $topArtists = getTopArtistsByCountryAndGenre($country, $mainGenre, $spotifyToken);
 
-            // Das erste Genre des Künstlers holen
-            $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
-            $firstGenre = $artist['genres'][0] ?? 'Unknown';
+            foreach ($topArtists as $index => $artist) {
+                $artistName = $artist['name'] ?? 'Unknown';
+                $rank = $index + 1;
 
-            // Das Genre basierend auf der Kategorie anpassen
-            $adjustedGenre = adjustGenreBasedOnCategory($firstGenre, $mainGenre);
+                // Das erste Genre des Künstlers holen
+                $artistGenres = implode(', ', $artist['genres'] ?? ['Unknown']);
+                $firstGenre = $artist['genres'][0] ?? 'Unknown';
 
-            // Künstler-Array mit angepasstem Genre ergänzen
-            $artistDataArray[] = [
-                "country" => $country,
-                "artist_name" => $artistName,
-                "rank" => $rank,
-                "genre" => $adjustedGenre
-            ];
+                // Das Genre basierend auf der Kategorie anpassen
+                $adjustedGenre = adjustGenreBasedOnCategory($firstGenre, $mainGenre);
+
+                // SQL-Anweisung zum Einfügen der Künstlerdaten in die Datenbank
+                $stmt = $pdo->prepare("INSERT INTO artists (country, artist, rank, genre) VALUES (:country, :artist, :rank, :genre)");
+                $stmt->execute([
+                    ':country' => $country,
+                    ':artist' => $artistName,
+                    ':rank' => $rank,
+                    ':genre' => $adjustedGenre
+                ]);
+
+                echo "Künstler $artistName aus $country erfolgreich in die Datenbank eingefügt!<br>";
+            }
         }
     }
+
+} catch (PDOException $e) {
+    // Fehlermeldung, falls die Verbindung oder der Insert fehlschlägt
+    echo "Fehler bei der Verbindung zur Datenbank: " . $e->getMessage();
 }
 
-// Ausgabe des Ergebnisses (Beispiel für print_r zur Anzeige)
-echo "<pre>";
-print_r($artistDataArray);
-echo "</pre>";
-
-return $artistDataArray;
+// Verbindung schließen
+$pdo = null;
 
 ?>
