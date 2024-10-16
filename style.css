@@ -21,6 +21,7 @@ h1 {
 h2 {
   color: white;
   margin-bottom: 20px;
+  font-size: 3rem;
 }
 
 /* Dropdowns */
@@ -85,11 +86,20 @@ button:hover {
 
 .results-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 
 .box {
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  padding: 2rem;
+  width: 40%;
+}
+
+
+.textbox {
   margin-top: 40px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50px;
@@ -123,6 +133,15 @@ button:hover {
 
 .titelevents{
   margin-top: 50px;
+}
+
+#datePicker {
+  background-color: #222;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 50px;
 }
 
 #place1 {
