@@ -35,40 +35,36 @@
       <option value="metal">Metal</option>
     </select>
 
+    <!-- Datumsauswahl-Feld -->
+<label for="date">Datum auswählen:</label>
+<input type="date" id="datePicker" value="2024-10-16">
+
     <!-- Interaktive Karte für Länder -->
     <div id="map"></div>
   </div>
 
-  <!-- Platzhalter für das ausgewählte Land -->
+  <!-- Platzhalter für das ausgewählte Land 
   <h3 id="selected-country">Aktuell ausgewähltes Land: Schweiz</h3>
-
+-->
   <div class="results-container">
     <!-- Bereich für die Anzeige der Top-Songs -->
     <div class="box" id="songs-box">
       <h2>Top 3 Songs</h2>
       <div id="spotify-songs"></div>
-      <div class="barcharts">
-      <div class="bar" id="place2"><p>2</p></div>
-      <div class="bar" id="place1"><p>1</p></div>
-      <div class="bar" id="place3"><p>3</p></div>
-      </div>
     </div>
 
     <!-- Bereich für die Anzeige der Top-Künstler -->
     <div class="box" id="artists-box">
       <h2>Top 3 Künstler</h2>
       <div id="spotify-artists"></div>
-        <div class="barcharts">
-          <div class="bar" id="place2"><p>2</p></div>
-          <div class="bar" id="place1"><p>1</p></div>
-          <div class="bar" id="place3"><p>3</p></div>
-        </div>
     </div>
   </div>
 
-  <!-- Bereich für die Anzeige der Musikevents -->
+  
+ <!-- Bereich für die Anzeige der Musikevents
   <div class="titelevents"><h2>Musikevents</h2></div>
   <div id="result"></div>
+ -->
 
  <div class="alltime"> <!-- Dropdown für die Musikauswahl -->
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
@@ -113,8 +109,8 @@
     const locationIQApiKey = 'pk.a00653df4d05d09645fc72e5f5839155'; // Dein LocationIQ API-Key
 
     // Funktion zur Umwandlung von Koordinaten in Ortsnamen
-    async function getLocationName(lat, lon) {
-      const url = `https://us1.locationiq.com/v1/reverse.php?key=${locationIQApiKey}&lat=${lat}&lon=${lon}&format=json`;
+   /* async function getLocationName(lat, lon) {
+    //  const url = https://us1.locationiq.com/v1/reverse.php?key=${locationIQApiKey}&lat=${lat}&lon=${lon}&format=json;
       
       try {
         const response = await fetch(url);
@@ -124,8 +120,8 @@
         console.error('Fehler beim Abrufen der Ortsdaten:', error);
         return 'Unbekannter Ort';  // Fallback bei Fehler
       }
-    }
-
+    }*/
+/*
     // Funktion zur Anzeige der Events und Umwandlung der Koordinaten
 async function displayFutureEvents(eventsData) {
   const resultDiv = document.getElementById('result');
@@ -155,17 +151,19 @@ async function displayFutureEvents(eventsData) {
     resultDiv.innerHTML = '<p>No events found</p>';
   }
 }
+  */
 
   </script>
 
   <!-- Verknüpfe die Karten-Logik -->
   <script>
+
     const interactiveCountries = ['CH', 'US', 'BR', 'DE', 'GB', 'JP'];
-    let selectedCountry = ''; // Gespeicherte Auswahl des Landes
+    selectedCountry = ''; // Gespeicherte Auswahl des Landes
 
     // Karte initialisieren
-    const map = L.map('map').setView([20, 0], 2);
 
+    const map = L.map('map').setView([20, 0], 2);
     // OpenStreetMap-Kacheln hinzufügen
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -195,6 +193,8 @@ async function displayFutureEvents(eventsData) {
         }).addTo(map);
       })
       .catch(error => console.error('Fehler beim Laden der GeoJSON-Daten:', error));
+
+
 
     function searchEventsAndTopInSelectedCountry() {
       const genre = document.getElementById('genre').value;

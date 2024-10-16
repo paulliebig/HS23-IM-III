@@ -8,6 +8,8 @@ let genreStreamChartInstance; // Für die Spotify-Genre-Popularitätsanalyse
 let genreTrendChartInstance;  // Für die Entwicklung der Genres
 
 let selectedCountry = ''; // Gespeicherte Auswahl des Landes
+let date = document.querySelector("#datePicker").value  
+
 
 
 // Subgenres definieren für verschiedene Genres
@@ -42,8 +44,22 @@ async function getSpotifyToken() {
 
 async function searchTopGenresStreams() {
   let country = document.getElementById('streamCountry').value; // Hol das ausgewählte Land
-  let genre = document.getElementById('genre').value; // Hol das ausgewählte Genre
 
+
+  let genre = document.getElementById('genre').value; // Hol das ausgewählte Genre
+  // Event-Listener für die Genre-Auswahl hinzufügen
+document.getElementById('genre').addEventListener('change', function() {
+  // Hole das ausgewählte Genre
+  const selectedGenre = this.value;
+
+  // Hole das aktuell ausgewählte Land
+  const selectedCountry = document.getElementById('streamCountry').value;
+
+  // Aktualisiere die Charts, Rankings und Events basierend auf dem Genre und dem Land
+  searchEventsAndTopInSelectedCountry(selectedCountry, selectedGenre);
+  searchTopGenresStreams();
+  getGenreTrendsOverYears();
+});
   // Standardwerte setzen, falls kein Land oder Genre ausgewählt wurde
   if (!country) {
     country = 'CH'; // Standardmäßig Schweiz
@@ -277,29 +293,93 @@ function displayGenreTrends(years, values) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // Funktionen zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
 async function searchEventsAndTopInSelectedCountry(country) {
   const genre = document.getElementById('genre').value;
 
   searchTopSongsInSelectedCountry(country, genre);
   searchTopArtistsInSelectedCountry(country, genre);
-  searchEvents(genre, country);
+ // searchEvents(genre, country);
 }
+*/
 
-// Spotify: Search for top songs by country and genre
-async function searchTopSongsInSelectedCountry(country, genre) {
-  const token = await getSpotifyToken();
 
-  const topTracksResponse = await fetch(`https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&market=${country}&limit=3`, {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + token
+
+
+
+
+
+
+
+
+// Search for top songs by country and genre (from the database)
+async function searchTopSongsInSelectedCountry(country, genre,) {
+   // Das ausgewählte Datum
+  console.log(date);
+  try {
+    // Fetch top songs data from your PHP endpoint (replace with your actual endpoint for songs)
+    const topSongsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}`);
+
+    console.log(topSongsResponse);
+  
+
+    // Ensure the response is successful
+    if (!topSongsResponse.ok) {
+      throw new Error(`Error fetching songs: ${topSongsResponse.statusText}`);
     }
-  });
 
-  const topTracksData = await topTracksResponse.json();
-  displayTopSongs(topTracksData);
+    // Parse the JSON data
+    const topSongsData = await topSongsResponse.json();
+
+    // Display the top 10 songs
+    displayTopSongs(topSongsData);
+  } catch (error) {
+    console.error('Error fetching top songs:', error);
+    document.getElementById('spotify-songs').innerHTML = '<p>Fehler beim Abrufen der Songs. Bitte später erneut versuchen.</p>';
+  }
 }
+// Function to display the top 10 songs on the webpage
+function displayTopSongs(topSongsData) {
+  const resultDiv = document.getElementById('spotify-songs');
+  resultDiv.innerHTML = ''; // Clear previous results
+
+  // Check if there are any songs in the response
+  if (Array.isArray(topSongsData) && topSongsData.length > 0) {
+    // Display up to 10 songs
+    topSongsData.slice(0, 10).forEach((song, index) => {
+      resultDiv.innerHTML += `
+        <div>
+          <p><strong>${index + 1}. ${song.song}</strong></p>
+        </div>`;
+    });
+  } else {
+    resultDiv.innerHTML = '<p>No songs found for the selected country and genre.</p>';
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 // Spotify: Search for top artists by country and genre
 async function searchTopArtistsInSelectedCountry(country, genre) {
@@ -336,30 +416,28 @@ function displayTopArtists(topArtistsData) {
     topArtistsData.slice(0, 10).forEach((artist, index) => {
       resultDiv.innerHTML += `
         <div>
-          <p><strong>${index + 1}. ${artist.artist}</strong> - ${artist.genre} (Rank: ${artist.rank})</p>
+          <p><strong>${index + 1}. ${artist.artist}</strong></p>
         </div>`;
     });
   } else {
     resultDiv.innerHTML = '<p>No artists found for the selected country and genre.</p>';
   }
 }
-// Display the top 3 songs
-function displayTopSongs(topTracksData) {
-  const resultDiv = document.getElementById('spotify-songs');
-  resultDiv.innerHTML = ''; // Clear previous results
 
-  if (topTracksData.tracks && topTracksData.tracks.items.length > 0) {
-    topTracksData.tracks.items.forEach((track) => {
-      resultDiv.innerHTML += `
-        <div>
-          <p>${track.name}</p>
-        </div>`;
-    });
-  } else {
-    resultDiv.innerHTML += '<p>No songs found</p>';
-  }
-}
 
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // PredictHQ: Search for events by music genre and country, only future events
 function searchEvents(genre, country) {
   const currentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
@@ -409,7 +487,7 @@ function displayFutureEvents(eventsData) {
   }
 }
 
-
+*/
 
 
 
@@ -476,8 +554,10 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
     getGenreTrendsOverYears();
   };
 
+  
 // Funktion zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
 async function searchEventsAndTopInSelectedCountry(country, genre) {
+  console.log('Selected Country:', country);
   // Default-Werte, falls nichts ausgewählt wurde
   country = country || document.getElementById('streamCountry').value;
   genre = genre || document.getElementById('genre').value;

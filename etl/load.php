@@ -1,43 +1,63 @@
 <?php
-include_once 'config.php'; // Include the config.php file   
 
+// Include the configuration file for the database connection
+require 'config.php';
+
+header('Content-Type: application/json');
+
+// Establish connection to the database
 try {
-    // PDO-Verbindung herstellen
     $pdo = new PDO($dsn, $user, $password, $options);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    echo "Verbindung zur Datenbank erfolgreich hergestellt.<br>";
+    // Retrieve country and genre from the URL and filter
+    $country = isset($_GET['country']) ? $_GET['country'] : null;
+    $genre = isset($_GET['genre']) ? $_GET['genre'] : null;
+
+    // SQL query with optional WHERE conditions
+    $sql = "SELECT country, song, rank, genre FROM music_data WHERE 1=1";
+    
+    // Add conditions only if values are provided
+    if ($country) {
+        // Use LIKE for partial matches
+        $sql .= " AND country LIKE :country";
+    }
+    if ($genre) {
+        // Use LIKE for partial matches
+        $sql .= " AND genre LIKE :genre";
+    }
+
+    $stmt = $pdo->prepare($sql);
+
+    // Bind parameters and add wildcards for partial matches
+    if ($country) {
+        $country = "%" . $country . "%"; // Allow partial match
+        $stmt->bindParam(':country', $country, PDO::PARAM_STR);
+    }
+    if ($genre) {
+        $genre = "%" . $genre . "%"; // Allow partial match
+        $stmt->bindParam(':genre', $genre, PDO::PARAM_STR);
+    }
+
+    // Execute the SQL query
+    $stmt->execute();
+
+    // Fetch all results
+    $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Check if data was found
+    if (count($songs) > 0) {
+        // Output the data in JSON format
+        echo json_encode($songs, JSON_PRETTY_PRINT);
+    } else {
+        echo json_encode(["message" => "No song data found."]);
+    }
 
 } catch (PDOException $e) {
-    die("Datenbankverbindung fehlgeschlagen: " . $e->getMessage());
+    // Error message if connection or query fails
+    echo json_encode(["error" => "Error connecting to the database: " . $e->getMessage()]);
 }
 
-// Angenommen, die Daten wurden bereits in einem Array $songDataArray in extract.php erzeugt
-$songDataArray = include 'extract.php'; // Hiermit stellen wir sicher, dass die Daten aus extract.php verfügbar sind
-print_r($songDataArray);
-// SQL-Befehl zum Einfügen der Daten in die Tabelle
-$sql = "INSERT INTO music_data (country, song, rank, genre) VALUES (:country, :song, :rank, :genre)";
-
-$stmt = $pdo->prepare($sql);
-
-// Durchlaufe das Array und füge jeden Song in die Datenbank ein
-foreach ($songDataArray as $songData) {
-    try {
-        // Daten binden und ausführen
-        $stmt->execute([
-            ':country' => $songData['country'],
-            ':song' => $songData['song_name'],
-            ':rank' => $songData['rank'],
-            ':genre' => $songData['genre']
-        ]);
-
-        echo "Song erfolgreich eingefügt: " . $songData['song_name'] . " (Land: " . $songData['country'] . ")<br>";
-
-    } catch (PDOException $e) {
-        echo "Fehler beim Einfügen des Songs " . $songData['song_name'] . ": " . $e->getMessage() . "<br>";
-    }
-}
-
-echo "Alle Songs wurden erfolgreich in die Datenbank geladen.";
+// Close the connection
+$pdo=null;
 
 ?>

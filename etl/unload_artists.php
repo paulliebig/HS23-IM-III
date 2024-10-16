@@ -14,7 +14,7 @@ try {
     $genre = isset($_GET['genre']) ? $_GET['genre'] : null;
 
     // SQL-Anweisung mit optionalen WHERE-Bedingungen
-    $sql = "SELECT country, artist, rank, genre FROM artists WHERE 1=1";
+    $sql = "SELECT timestamp, country, artist, rank, genre FROM artists WHERE 1=1";
     
     // Bedingungen nur hinzufügen, wenn Werte vorhanden sind
     if ($country) {
