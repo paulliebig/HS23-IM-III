@@ -305,16 +305,6 @@ function displayGenreTrends(years, values) {
 
 
 
-/*
-// Funktionen zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
-async function searchEventsAndTopInSelectedCountry(country) {
-  const genre = document.getElementById('genre').value;
-
-  searchTopSongsInSelectedCountry(country, genre);
-  searchTopArtistsInSelectedCountry(country, genre);
- // searchEvents(genre, country);
-}
-*/
 
 
 
@@ -440,62 +430,6 @@ function displayTopArtists(topArtistsData) {
 
 
 
-/*
-// PredictHQ: Search for events by music genre and country, only future events
-function searchEvents(genre, country) {
-  const currentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-  const url = `https://api.predicthq.com/v1/events/?q=${encodeURIComponent(genre)}&country=${encodeURIComponent(country)}&start.gte=${currentDate}&sort=start`;
-
-  fetch(url, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${predictHQApiKey}`,
-      'Accept': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    displayFutureEvents(data); // Show only future events
-  })
-  .catch(error => {
-    console.error('Error fetching events:', error);
-    document.getElementById('result').innerHTML = '<p>Error fetching events. Try again later.</p>';
-  });
-}
-
-// Display future events only (max 5 events)
-function displayFutureEvents(eventsData) {
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = ''; // Clear previous results
-
-  if (eventsData && eventsData.results && eventsData.results.length > 0) {
-    // Display up to 5 future events
-    eventsData.results.slice(0, 5).forEach(event => {
-      const eventHTML = `
-        <div>
-          <h4>${event.title}</h4>
-          <p>Date: ${new Date(event.start).toLocaleDateString()}</p>
-          <p>Location: ${event.location ? event.location.join(', ') : 'Location not available'}</p>
-        </div>
-        <hr>`;
-      resultDiv.innerHTML += eventHTML;
-    });
-
-    // If no events are returned
-    if (eventsData.results.length === 0) {
-      resultDiv.innerHTML = '<p>No upcoming events found</p>';
-    }
-  } else {
-    resultDiv.innerHTML = '<p>No events found</p>';
-  }
-}
-
-*/
-
-
-
-
-
 // Liste aller Länder, die wir wollen
 const countries = [ 'United States of America', 'Germany', 'United Kingdom', 'Brazil', 'Japan', 'Switzerland' ];
 
@@ -598,4 +532,8 @@ function setDateToToday() {
 
 // Call the function to initialize the date picker with today's date
 setDateToToday();
+
+
+
+
 

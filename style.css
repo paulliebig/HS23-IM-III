@@ -251,6 +251,8 @@ canvas {
     width: 80%;
   }
 
+ 
+
   .textbox {
     width: 80%;
   }
@@ -258,6 +260,18 @@ canvas {
 
   .results-container {
     flex-direction: column;
+  }
+
+  #genreChart {
+    padding: 1rem;
+
+    
+  }
+
+  #genreStreamChart {
+    padding: 1rem;
+
+    
   }
 
   #map {
@@ -269,5 +283,9 @@ canvas {
   #result {
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+
+  #spotify-songs p {
+    font-size: 14px;
   }
 }

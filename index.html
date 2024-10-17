@@ -48,36 +48,34 @@
   <div class="results-container">
     <!-- Bereich für die Anzeige der Top-Songs -->
     <div class="box" id="songs-box">
-      <h2>Top 3 Songs</h2>
+      <h2>Top Songs</h2>
       <div id="spotify-songs"></div>
     </div>
 
     <!-- Bereich für die Anzeige der Top-Künstler -->
     <div class="box" id="artists-box">
-      <h2>Top 3 Künstler</h2>
+      <h2>Top Künstler</h2>
       <div id="spotify-artists"></div>
     </div>
   </div>
 
   <div class="textbox" id="textbox1">
-    <h3>Titel blabla</h3>
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, 
-      sed diam nonumy eirmod tempor invidunt ut labore et dolore magna 
-      aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo 
-      dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus 
-      est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur 
-      sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-       dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
-       et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea 
-       takimata sanctus est Lorem ipsum dolor sit amet.</p>
+    <p>Die Musikcharts bieten einen faszinierenden Einblick in die 
+      musikalischen Vorlieben und Entwicklungen einer bestimmten Zeit. 
+      Sie zeigen, welche Künstler und Songs besonders großen Einfluss 
+      hatten und wie sich Trends in der Musikwelt veränderten. 
+      Ob etablierte Grössen oder aufstrebende Talente - 
+      die Rankings verdeutlichen, wie vielfältig und 
+      dynamisch die Musiklandschaft zu verschiedenen 
+      Zeitpunkten war. Diese Übersicht lädt dazu ein, 
+      die musikalischen Highlights einer bestimmten Epoche 
+      zu entdecken und zu verstehen, welche Klänge zu dieser 
+      Zeit besonders im Fokus standen.</p>
     </div>
     
 
   
- <!-- Bereich für die Anzeige der Musikevents
-  <div class="titelevents"><h2>Musikevents</h2></div>
-  <div id="result"></div>
- -->
+
 
  <div class="alltime"> <!-- Dropdown für die Musikauswahl -->
   <label for="trendGenre">Musikrichtung auswählen (für All-Time Entwicklung):</label>
@@ -95,17 +93,17 @@
   <!-- Bereich für die Anzeige der Genre-Trends Grafik -->
   <canvas id="genreChart" width="400" height="200"></canvas>
 
-  <div class="textbox" id="textbox1">
-    <h3>Titel blabla</h3>
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, 
-      sed diam nonumy eirmod tempor invidunt ut labore et dolore magna 
-      aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo 
-      dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus 
-      est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur 
-      sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-       dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
-       et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea 
-       takimata sanctus est Lorem ipsum dolor sit amet.</p>
+  <div class="textbox" id="textbox2">
+    <p>Die Grafik veranschaulicht die Entwicklung der Beliebtheit des 
+      ausgewählten Musikgenres über einen Zeitraum von fünf Jahren.
+       Durch die Berechnung des 5-Jahres-Durchschnitts lassen sich 
+       langfristige Trends und Veränderungen in den Hörgewohnheiten 
+       der Menschen erkennen. Diese Methode hilft, einen klareren 
+       Blick auf die allgemeine Entwicklung des Genres zu werfen.
+        Die dargestellten Daten bieten wertvolle Einblicke in die 
+        kulturelle Bedeutung und den Stellenwert des Genres im Laufe 
+        der Jahre und zeigen, wie sich dessen Popularität im Vergleich 
+        zu anderen musikalischen Strömungen verändert hat.</p>
     </div>
 
   <!-- Bereich für die Abfrage der Spotify-Genre-Popularität -->
@@ -136,55 +134,7 @@
   <script>
     const locationIQApiKey = 'pk.a00653df4d05d09645fc72e5f5839155'; // Dein LocationIQ API-Key
 
-    // Funktion zur Umwandlung von Koordinaten in Ortsnamen
-   /* async function getLocationName(lat, lon) {
-    //  const url = https://us1.locationiq.com/v1/reverse.php?key=${locationIQApiKey}&lat=${lat}&lon=${lon}&format=json;
-      
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.display_name;  // Gib den Ortsnamen zurück
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Ortsdaten:', error);
-        return 'Unbekannter Ort';  // Fallback bei Fehler
-      }
-    }*/
-/*
-    // Funktion zur Anzeige der Events und Umwandlung der Koordinaten
-async function displayFutureEvents(eventsData) {
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = ''; // Clear previous results
-
-  if (eventsData && eventsData.results && eventsData.results.length > 0) {
-    // Display up to 5 future events
-    for (const event of eventsData.results.slice(0, 5)) {
-      const [lon, lat] = event.location;  // Korrigiere die Reihenfolge der Koordinaten: Longitude (Ost), Latitude (Nord)
-      const locationName = await getLocationName(lat, lon);  // Koordinaten umwandeln
-
-      const eventHTML = `
-        <div>
-          <h4>${event.title}</h4>
-          <p>Date: ${new Date(event.start).toLocaleDateString()}</p>
-          <p>Location: ${locationName} (${lat}, ${lon})</p>
-        </div>
-        <hr>`;
-      resultDiv.innerHTML += eventHTML;
-    }
-
-    // If no events are returned
-    if (eventsData.results.length === 0) {
-      resultDiv.innerHTML = '<p>No upcoming events found</p>';
-    }
-  } else {
-    resultDiv.innerHTML = '<p>No events found</p>';
-  }
-}
-  */
-
-  </script>
-
-  <!-- Verknüpfe die Karten-Logik -->
-  <script>
+   
 
     const interactiveCountries = ['CH', 'US', 'BR', 'DE', 'GB', 'JP'];
     selectedCountry = ''; // Gespeicherte Auswahl des Landes
@@ -237,16 +187,7 @@ async function displayFutureEvents(eventsData) {
   </script>
 
 <div class="textbox" id="textbox1">
-  <h3>Titel blabla</h3>
-  <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, 
-    sed diam nonumy eirmod tempor invidunt ut labore et dolore magna 
-    aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo 
-    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus 
-    est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur 
-    sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-     dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
-     et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea 
-     takimata sanctus est Lorem ipsum dolor sit amet.</p>
+  <p>Das Balkendiagramm bietet einen direkten Vergleich der Popularität von fünf Musikgenres im ausgewählten Land. Die Popularitäts-Scores, die auf einer Skala von 1 bis 100 angegeben werden, ermöglichen es, auf einen Blick zu erkennen, welche Genres in der jeweiligen Region am beliebtesten sind. Diese visuelle Darstellung macht es leicht, Trends zu identifizieren und herauszufinden, wie stark die einzelnen Genres im Vergleich zueinander stehen. Solche Analysen bieten wertvolle Einblicke in regionale Musikpräferenzen und zeigen, wie kulturelle Unterschiede die musikalischen Vorlieben beeinflussen können.</p>
   </div>
 </body>
 </html>
