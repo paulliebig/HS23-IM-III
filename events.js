@@ -12,6 +12,10 @@ let date = document.querySelector("#datePicker").value
 
 
 
+
+
+
+
 // Subgenres definieren für verschiedene Genres
 const subgenresMap = {
   rock: ['rock', 'classic rock', 'alternative rock', 'hard rock', 'indie rock', 'progressive rock', 'soft rock'],
@@ -20,6 +24,20 @@ const subgenresMap = {
   jazz: ['jazz', 'smooth jazz', 'bebop', 'vocal jazz', 'free jazz', 'fusion jazz', 'swing'],
   electronic: ['electronic', 'house', 'techno', 'trance', 'dubstep', 'drum and bass', 'electro']
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+// API Authentifikation
 
 // Verfügbare Genres für die Spotify Stream-Abfrage
 const availableGenres = ['rock', 'pop', 'hip-hop', 'jazz', 'electronic'];
@@ -41,6 +59,24 @@ async function getSpotifyToken() {
   return data.access_token; // Return access token
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Genre und Country Selektion
+
 async function searchTopGenresStreams() {
   let country = document.getElementById('streamCountry').value; // Hol das ausgewählte Land
 
@@ -59,6 +95,7 @@ document.getElementById('genre').addEventListener('change', function() {
   searchTopGenresStreams();
   getGenreTrendsOverYears();
 });
+
   // Standardwerte setzen, falls kein Land oder Genre ausgewählt wurde
   if (!country) {
     country = 'CH'; // Standardmäßig Schweiz
@@ -68,6 +105,67 @@ document.getElementById('genre').addEventListener('change', function() {
   }
 
   const token = await getSpotifyToken();
+
+
+
+
+
+
+
+
+
+  // Datumfeld initialisieren und auf heute setzen
+
+// Function to set today's date dynamically
+function setDateToToday() {
+  const today = new Date(); // Get current date
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
+  const day = String(today.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+
+  const formattedDate = `${year}-${month}-${day}`; // Format the date as YYYY-MM-DD
+
+  // Set the max attribute to today's date to prevent future dates
+  document.getElementById('datePicker').setAttribute('max', formattedDate);
+  
+  // Set the value attribute to today's date as the default selected date
+  document.getElementById('datePicker').setAttribute('value', formattedDate);
+}
+
+// Call the function to initialize the date picker with today's date
+setDateToToday();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Erstelle ein leeres Objekt, um die durchschnittliche Popularität pro Genre zu speichern
   let genrePopularity = {};
@@ -81,6 +179,26 @@ document.getElementById('genre').addEventListener('change', function() {
       console.error(`Error fetching genre popularity for ${genre}:`, error);
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Website Teil 3: Balkendiagramm
+
+
+  // Schritt 1: Daten fetchen
 
   // Zeichne das Balkendiagramm basierend auf der durchschnittlichen Popularität der Genres
   displayAverageGenrePopularityChart(genrePopularity);
@@ -118,6 +236,13 @@ async function calculateAverageGenrePopularity(genre, country, token) {
   const averagePopularity = trackCount > 0 ? totalPopularity / trackCount : 0;
   return averagePopularity; // Durchschnittliche Popularität für das Genre
 }
+
+
+
+
+
+// Schritt 2: Balkendiagramm anzeigen
+
 
 // Display the average genre popularity as a bar chart
 function displayAverageGenrePopularityChart(genrePopularity) {
@@ -165,6 +290,22 @@ function displayAverageGenrePopularityChart(genrePopularity) {
     }
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Website Teil 2: Kurvendiagramm
+
+
 
 // MusicBrainz: Get Genre Trends over the years using global artist release data with pagination and subgenre support
 async function getGenreTrendsOverYears() {
@@ -307,7 +448,7 @@ function displayGenreTrends(years, values) {
 
 
 
-
+// Website Teil 1: Top Songs und Künstler
 
 
 
@@ -430,6 +571,14 @@ function displayTopArtists(topArtistsData) {
 
 
 
+
+
+
+
+
+// Map-Teil: Ländergrenzen und Klick-Events
+
+
 // Liste aller Länder, die wir wollen
 const countries = [ 'United States of America', 'Germany', 'United Kingdom', 'Brazil', 'Japan', 'Switzerland' ];
 
@@ -475,6 +624,41 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
   
 
 
+
+
+
+
+
+
+
+
+
+  // Funktion zur Abfrage von Top Künstlern, Top Songs und Events
+async function searchEventsAndTopInSelectedCountry(country, genre) {
+  console.log('Selected Country:', country);
+  // Default-Werte, falls nichts ausgewählt wurde
+  country = country || document.getElementById('streamCountry').value;
+  genre = genre || document.getElementById('genre').value;
+
+  searchTopSongsInSelectedCountry(country, genre, date);
+  searchTopArtistsInSelectedCountry(country, genre, date);
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Standardwerte für die Website festlegen
+
   // Funktion für Standard-Einträge (z.B. weltweit und Rock)
   window.onload = function() {
     const defaultCountry = 'CH';  // Standardmäßig Schweiz
@@ -492,20 +676,16 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
     getGenreTrendsOverYears();
   };
 
+
+
+
+
+
+
+
+
+
   
-// Funktion zur Abfrage von Top 3 Künstlern, Top 3 Songs und Events
-async function searchEventsAndTopInSelectedCountry(country, genre) {
-  console.log('Selected Country:', country);
-  // Default-Werte, falls nichts ausgewählt wurde
-  country = country || document.getElementById('streamCountry').value;
-  genre = genre || document.getElementById('genre').value;
-
-  searchTopSongsInSelectedCountry(country, genre, date);
-  searchTopArtistsInSelectedCountry(country, genre, date);
-  
-}
-
-// Weitere bestehende Funktionen bleiben unverändert (searchTopSongsInSelectedCountry, searchTopArtistsInSelectedCountry, etc.)
 
 
 
@@ -514,24 +694,11 @@ async function searchEventsAndTopInSelectedCountry(country, genre) {
 
 
 
-// Function to set today's date dynamically
-function setDateToToday() {
-  const today = new Date(); // Get current date
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
-  const day = String(today.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
 
-  const formattedDate = `${year}-${month}-${day}`; // Format the date as YYYY-MM-DD
 
-  // Set the max attribute to today's date to prevent future dates
-  document.getElementById('datePicker').setAttribute('max', formattedDate);
-  
-  // Set the value attribute to today's date as the default selected date
-  document.getElementById('datePicker').setAttribute('value', formattedDate);
-}
 
-// Call the function to initialize the date picker with today's date
-setDateToToday();
+
+
 
 
 
