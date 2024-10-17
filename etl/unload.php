@@ -11,12 +11,12 @@ try {
     // Retrieve country, genre, and date from the URL and sanitize them
     $country = isset($_GET['country']) ? $_GET['country'] : null;
     $genre = isset($_GET['genre']) ? $_GET['genre'] : null;
-    $date = isset($_GET['date']) ? $_GET['date'] : null; // Das ausgewählte Datum
+    $date = isset($_GET['date']) ? $_GET['date'] : null; // The selected date in format: yyyy-mm-dd
 
-    // SQL query with optional WHERE conditions
+    // Base SQL query
     $sql = "SELECT timestamp, country, song, rank, genre FROM music_data WHERE 1=1";
     
-    // Append conditions only if values are provided
+    // Append filters only if values are provided
     if ($country) {
         $sql .= " AND country LIKE :country";
     }
@@ -24,22 +24,22 @@ try {
         $sql .= " AND genre LIKE :genre";
     }
     if ($date) {
-        $sql .= " AND DATE(timestamp) = :date"; // Date filter based on timestamp
+        $sql .= " AND DATE(timestamp) = :date"; // Filter based on the date
     }
 
     $stmt = $pdo->prepare($sql);
 
-    // Bind parameters and add wildcards for partial matches
+    // Bind parameters to allow partial matching with wildcards
     if ($country) {
-        $country = "%" . $country . "%"; // Allow partial match
+        $country = "%" . $country . "%";
         $stmt->bindParam(':country', $country, PDO::PARAM_STR);
     }
     if ($genre) {
-        $genre = "%" . $genre . "%"; // Allow partial match
+        $genre = "%" . $genre . "%";
         $stmt->bindParam(':genre', $genre, PDO::PARAM_STR);
     }
     if ($date) {
-        $stmt->bindParam(':date', $date, PDO::PARAM_STR); // Bind date parameter
+        $stmt->bindParam(':date', $date, PDO::PARAM_STR);
     }
 
     // Execute SQL query

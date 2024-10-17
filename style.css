@@ -221,6 +221,11 @@ canvas {
     padding-left: 3rem;
     padding-right: 3rem;
   }
+
+  #map {
+    pointer-events: auto; /* Benutzer können die Karte auf Tablets verschieben */
+  }
+
   
 
 }
@@ -256,11 +261,10 @@ canvas {
   }
 
   #map {
-    height: 300px;
-    width: 100%;
-    margin-bottom: 20px;
-    border-radius: 50px;
+    pointer-events: auto; /* Benutzer können die Karte auf Smartphones verschieben */
+    height: 400px; /* Optional: Höhe der Karte auf kleineren Bildschirmen anpassen */
   }
+
 
   #result {
     padding-left: 2rem;

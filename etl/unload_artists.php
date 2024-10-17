@@ -1,63 +1,68 @@
 <?php
-
-// Einbinden der Konfigurationsdatei für die Datenbankverbindung
+// Include database configuration file
 require 'config.php';
 
 header('Content-Type: application/json');
 
-// Verbindung zur Datenbank herstellen
+// Establish connection to the database
 try {
     $pdo = new PDO($dsn, $user, $password, $options);
 
-    // Country und Genre aus der URL abrufen und filtern
+    // Retrieve country, genre, and date from the URL and sanitize them
     $country = isset($_GET['country']) ? $_GET['country'] : null;
     $genre = isset($_GET['genre']) ? $_GET['genre'] : null;
+    $date = isset($_GET['date']) ? $_GET['date'] : null; // The selected date in format: yyyy-mm-dd
 
-    // SQL-Anweisung mit optionalen WHERE-Bedingungen
-    $sql = "SELECT timestamp, country, artist, rank, genre FROM artists WHERE 1=1";
+    // Base SQL query for fetching artists
+    $sql = "SELECT timestamp, country, artist, genre FROM artists WHERE 1=1";
     
-    // Bedingungen nur hinzufügen, wenn Werte vorhanden sind
+    // Append filters only if values are provided
     if ($country) {
-        // Verwenden Sie LIKE für Teilübereinstimmungen
         $sql .= " AND country LIKE :country";
     }
     if ($genre) {
-        // Verwenden Sie LIKE für Teilübereinstimmungen
         $sql .= " AND genre LIKE :genre";
+    }
+    if ($date) {
+        $sql .= " AND DATE(timestamp) = :date"; // Filter based on the date
     }
 
     $stmt = $pdo->prepare($sql);
 
-    // Parameter binden und Wildcards für Teilübereinstimmungen hinzufügen
+    // Bind parameters to allow partial matching with wildcards
     if ($country) {
-        $country = "%" . $country . "%"; // Teilübereinstimmung ermöglichen
+        $country = "%" . $country . "%";
         $stmt->bindParam(':country', $country, PDO::PARAM_STR);
     }
     if ($genre) {
-        $genre = "%" . $genre . "%"; // Teilübereinstimmung ermöglichen
+        $genre = "%" . $genre . "%";
         $stmt->bindParam(':genre', $genre, PDO::PARAM_STR);
     }
+    if ($date) {
+        $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+    }
 
-    // SQL-Anweisung ausführen
+    // Debugging: Output the SQL query with parameters
+    error_log("SQL Query: " . $sql);
+    error_log("Bound Parameters: Country: $country, Genre: $genre, Date: $date");
+
+    // Execute SQL query
     $stmt->execute();
 
-    // Alle Ergebnisse abrufen
+    // Fetch all results
     $artists = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Überprüfen, ob Daten gefunden wurden
+    // Check if any data was found
     if (count($artists) > 0) {
-        // Die Daten im JSON-Format ausgeben
         echo json_encode($artists, JSON_PRETTY_PRINT);
     } else {
-        echo json_encode(["message" => "Keine Künstlerdaten gefunden."]);
+        echo json_encode(["message" => "No artist data found."]);
     }
 
 } catch (PDOException $e) {
-    // Fehlermeldung, falls die Verbindung oder der Abruf fehlschlägt
-    echo json_encode(["error" => "Fehler bei der Verbindung zur Datenbank: " . $e->getMessage()]);
+    echo json_encode(["error" => "Database connection error: " . $e->getMessage()]);
 }
 
-// Verbindung schließen
-$pdo = null;
-
+// Close the connection
+$pdo=null;
 ?>

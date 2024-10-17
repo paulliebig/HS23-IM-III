@@ -18,12 +18,11 @@ const subgenresMap = {
   pop: ['pop', 'indie pop', 'electropop', 'synthpop', 'dance pop', 'teen pop', 'k-pop'],
   hiphop: ['hip hop', 'trap', 'rap', 'gangsta rap', 'boom bap', 'conscious hip hop', 'crunk'],
   jazz: ['jazz', 'smooth jazz', 'bebop', 'vocal jazz', 'free jazz', 'fusion jazz', 'swing'],
-  metal: ['metal', 'heavy metal', 'death metal', 'black metal', 'thrash metal', 'doom metal', 'power metal'],
   electronic: ['electronic', 'house', 'techno', 'trance', 'dubstep', 'drum and bass', 'electro']
 };
 
 // Verfügbare Genres für die Spotify Stream-Abfrage
-const availableGenres = ['rock', 'pop', 'hip-hop', 'jazz', 'metal', 'electronic'];
+const availableGenres = ['rock', 'pop', 'hip-hop', 'jazz', 'electronic'];
 
 // Spotify: Get access token via Client Credentials Flow
 async function getSpotifyToken() {
@@ -322,53 +321,58 @@ async function searchEventsAndTopInSelectedCountry(country) {
 
 
 
+// Add EventListener for the date picker
+document.getElementById('datePicker').addEventListener('change', function() {
+  const selectedDate = this.value;
+  const selectedCountry = document.getElementById('streamCountry').value; // Get selected country
+  const selectedGenre = document.getElementById('genre').value; // Get selected genre
 
+  // Call the function to search top songs with the new date, country, and genre
+  searchTopSongsInSelectedCountry(selectedCountry, selectedGenre, selectedDate);
 
+  // Fetch top artists based on the country, genre, and date
+  searchTopArtistsInSelectedCountry(selectedCountry, selectedGenre, selectedDate);
+});
 
-
-// Search for top songs by country and genre (from the database)
-async function searchTopSongsInSelectedCountry(country, genre,) {
-   // Das ausgewählte Datum
-  console.log(date);
+// Function to search top songs by country, genre, and date
+async function searchTopSongsInSelectedCountry(country, genre, date) {
   try {
-    // Fetch top songs data from your PHP endpoint (replace with your actual endpoint for songs)
-    const topSongsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}`);
-
+      // Fetch top songs data from your PHP endpoint, including the selected date
+      const topSongsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}&date=${encodeURIComponent(date)}`);
     console.log(topSongsResponse);
-  
+      // Ensure the response is successful
+      if (!topSongsResponse.ok) {
+          throw new Error(`Error fetching songs: ${topSongsResponse.statusText}`);
+      }
 
-    // Ensure the response is successful
-    if (!topSongsResponse.ok) {
-      throw new Error(`Error fetching songs: ${topSongsResponse.statusText}`);
-    }
+      // Parse the JSON data
+      const topSongsData = await topSongsResponse.json();
 
-    // Parse the JSON data
-    const topSongsData = await topSongsResponse.json();
-
-    // Display the top 10 songs
-    displayTopSongs(topSongsData);
+      // Display the top 10 songs
+      displayTopSongs(topSongsData);
   } catch (error) {
-    console.error('Error fetching top songs:', error);
-    document.getElementById('spotify-songs').innerHTML = '<p>Fehler beim Abrufen der Songs. Bitte später erneut versuchen.</p>';
-  }
+      console.error('Error fetching top songs:', error);
+      document.getElementById('spotify-songs').innerHTML = '<p>Fehler beim Abrufen der Songs. Bitte später erneut versuchen.</p>';
+  }
 }
-// Function to display the top 10 songs on the webpage
+
+// Function to display the top songs
 function displayTopSongs(topSongsData) {
   const resultDiv = document.getElementById('spotify-songs');
   resultDiv.innerHTML = ''; // Clear previous results
 
   // Check if there are any songs in the response
   if (Array.isArray(topSongsData) && topSongsData.length > 0) {
-    // Display up to 10 songs
-    topSongsData.slice(0, 10).forEach((song, index) => {
-      resultDiv.innerHTML += `
-        <div>
-          <p><strong>${index + 1}. ${song.song}</strong></p>
-        </div>`;
-    });
+      // Display up to 10 songs
+      topSongsData.slice(0, 10).forEach((song, index) => {
+          resultDiv.innerHTML += `
+              <div>
+                  <p><strong>${index + 1}. ${song.song}</strong></p>
+              </div>`;
+      });
   } else {
-    resultDiv.innerHTML = '<p>No songs found for the selected country and genre.</p>';
-  }
+      resultDiv.innerHTML = '<p>No songs found for the selected country, genre, and date.</p>';
+    }
 }
 
 
@@ -379,51 +383,50 @@ function displayTopSongs(topSongsData) {
 
 
 
+ 
 
-
-// Spotify: Search for top artists by country and genre
-async function searchTopArtistsInSelectedCountry(country, genre) {
+// Function to search top artists by country, genre, and date
+async function searchTopArtistsInSelectedCountry(country, genre, date) {
   try {
-    // Fetch top artists data from your PHP endpoint
-    const topArtistsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload_artists.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}`);
+      // Fetch top artists data from your PHP endpoint, including the selected date
+      const topArtistsResponse = await fetch(`https://im3paul.rigged-motion.com/etl/unload_artists.php?country=${encodeURIComponent(country)}&genre=${encodeURIComponent(genre)}&date=${encodeURIComponent(date)}`);
 
-    console.log(topArtistsResponse);
-       
-    // Ensure the response is successful
-    if (!topArtistsResponse.ok) {
-      throw new Error(`Error fetching artists: ${topArtistsResponse.statusText}`);
-    }
+      console.log(topArtistsResponse);
 
-    // Parse the JSON data
-    const topArtistsData = await topArtistsResponse.json();
+      // Ensure the response is successful
+      if (!topArtistsResponse.ok) {
+          throw new Error(`Error fetching artists: ${topArtistsResponse.statusText}`);
+      }
 
-    // Display the top 10 artists
-    displayTopArtists(topArtistsData);
+      // Parse the JSON data
+      const topArtistsData = await topArtistsResponse.json();
+
+      // Display the top 10 artists
+      displayTopArtists(topArtistsData);
   } catch (error) {
-    console.error('Error fetching top artists:', error);
-    document.getElementById('spotify-artists').innerHTML = '<p>Fehler beim Abrufen der Künstlerdaten. Bitte später erneut versuchen.</p>';
+      console.error('Error fetching top artists:', error);
+      document.getElementById('spotify-artists').innerHTML = '<p>Fehler beim Abrufen der Künstlerdaten. Bitte später erneut versuchen.</p>';
   }
 }
 
-// Function to display the top 10 artists on the webpage
+// Function to display the top artists
 function displayTopArtists(topArtistsData) {
   const resultDiv = document.getElementById('spotify-artists');
   resultDiv.innerHTML = ''; // Clear previous results
 
   // Check if there are any artists in the response
   if (Array.isArray(topArtistsData) && topArtistsData.length > 0) {
-    // Display up to 10 artists
-    topArtistsData.slice(0, 10).forEach((artist, index) => {
-      resultDiv.innerHTML += `
-        <div>
-          <p><strong>${index + 1}. ${artist.artist}</strong></p>
-        </div>`;
-    });
+      // Display up to 10 artists
+      topArtistsData.slice(0, 10).forEach((artist, index) => {
+          resultDiv.innerHTML += `
+              <div>
+                  <p><strong>${index + 1}. ${artist.artist}</strong></p>
+              </div>`;
+      });
   } else {
-    resultDiv.innerHTML = '<p>No artists found for the selected country and genre.</p>';
-  }
+      resultDiv.innerHTML = '<p>No artists found for the selected country, genre, and date.</p>';
+   }
 }
-
 
 
 
@@ -535,6 +538,7 @@ fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.g
   })
   .catch(error => console.error('Fehler beim Laden der GeoJSON-Daten:', error));
 
+  
 
 
   // Funktion für Standard-Einträge (z.B. weltweit und Rock)
@@ -562,9 +566,9 @@ async function searchEventsAndTopInSelectedCountry(country, genre) {
   country = country || document.getElementById('streamCountry').value;
   genre = genre || document.getElementById('genre').value;
 
-  searchTopSongsInSelectedCountry(country, genre);
-  searchTopArtistsInSelectedCountry(country, genre);
-  searchEvents(genre, country);
+  searchTopSongsInSelectedCountry(country, genre, date);
+  searchTopArtistsInSelectedCountry(country, genre, date);
+  
 }
 
 // Weitere bestehende Funktionen bleiben unverändert (searchTopSongsInSelectedCountry, searchTopArtistsInSelectedCountry, etc.)
@@ -572,4 +576,26 @@ async function searchEventsAndTopInSelectedCountry(country, genre) {
 
 
 
+
+
+
+
+// Function to set today's date dynamically
+function setDateToToday() {
+  const today = new Date(); // Get current date
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Get month and pad with 0 if needed
+  const day = String(today.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+
+  const formattedDate = `${year}-${month}-${day}`; // Format the date as YYYY-MM-DD
+
+  // Set the max attribute to today's date to prevent future dates
+  document.getElementById('datePicker').setAttribute('max', formattedDate);
+  
+  // Set the value attribute to today's date as the default selected date
+  document.getElementById('datePicker').setAttribute('value', formattedDate);
+}
+
+// Call the function to initialize the date picker with today's date
+setDateToToday();
 
