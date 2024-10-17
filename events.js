@@ -262,7 +262,7 @@ function displayAverageGenrePopularityChart(genrePopularity) {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Durchschnittliche Popularität (0-100) für Genres',
+        label: 'Popularität',
         data: data,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -275,13 +275,13 @@ function displayAverageGenrePopularityChart(genrePopularity) {
         x: {
           title: {
             display: true,
-            text: 'Genres'
+           
           }
         },
         y: {
           title: {
             display: true,
-            text: 'Durchschnittliche Popularität (0-100)'
+        
           },
           min: 60,
           max: 100
@@ -405,7 +405,7 @@ function displayGenreTrends(years, values) {
     data: {
       labels: filteredYears, // Nur gefilterte Jahre anzeigen
       datasets: [{
-        label: 'Beliebtheit des Genres über Jahre (5-Jahres-Durchschnitt)',
+        label: 'Beliebtheit im 5-Jahres-Schnitt',
         data: filteredValues, // Nur gefilterte Werte anzeigen
         fill: false,
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -418,13 +418,12 @@ function displayGenreTrends(years, values) {
         x: {
           title: {
             display: true,
-            text: 'Jahr (Mittelwert von 5 Jahren)'
           }
         },
         y: {
           title: {
             display: true,
-            text: 'Anzahl Veröffentlichungen (5-Jahres-Durchschnitt)'
+            text: 'Veröffentlichungen'
           }
         }
       }
